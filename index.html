@@ -1,0 +1,1425 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PPM Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css">
+  <style>
+    :root {
+      --bg: #f4f5f6;
+      --card: #ffffff;
+      --line: #e4e6e8;
+      --text: #4a4f55;
+      --blue: #169fdd;
+      --green: #2f9c5d;
+      --amber: #ff9f1c;
+      --red: #d94c61;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      padding: 20px;
+      overflow-x: auto;
+    }
+
+    .dashboard {
+      width: 1440px;
+      margin: 0 auto;
+      padding-bottom: 50px;
+    }
+    .hidden { display: none !important; }
+
+    .ai-shell {
+      width: 1440px;
+      margin: 0 auto 12px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 18px;
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+    .ai-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .ai-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #34404a;
+      margin: 0;
+    }
+    .ai-sub {
+      margin: 0;
+      font-size: 13px;
+      color: #6d7780;
+    }
+    .ai-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .prompt-chip {
+      border: 1px solid #dbe8f0;
+      border-radius: 6px;
+      background: #f8fcfe;
+      color: #456172;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: left;
+      padding: 10px;
+      cursor: pointer;
+    }
+    .prompt-chip.active {
+      border-color: #9fd6ed;
+      background: #edf8fd;
+      color: #27556c;
+    }
+    .ai-controls {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .ai-input {
+      width: 100%;
+      border: 1px solid #d6dee4;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 14px;
+      color: #3e4b55;
+    }
+    .ai-input:focus-visible {
+      outline: 2px solid #1a9ad6;
+      outline-offset: 1px;
+    }
+    .ai-run {
+      border: 0;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      background: var(--blue);
+      color: #fff;
+      cursor: pointer;
+    }
+    .ai-meta {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #74808a;
+    }
+    .top-hero {
+      height: 110px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 14px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      position: relative;
+    }
+
+    .hero-title { font-size: 16px; font-weight: 700; }
+    .hero-sub-row {
+      display: block;
+    }
+    .hero-sub { font-size: 13px; color: #6f767d; }
+    .hero-event-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #68737c;
+      margin-top: 4px;
+    }
+    .event-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid #f4c98b;
+      background: #fff5e7;
+      color: #a86c0f;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .01em;
+    }
+    .banner-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+    }
+
+
+    .filters {
+      min-height: 64px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #fff;
+      padding: 10px 12px;
+      display: grid;
+      grid-template-columns: 240px 240px 1fr 260px;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .range-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .tab-group {
+      display: inline-flex;
+      justify-self: start;
+      border: 1px solid #d7e8f1;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #f8fcfe;
+    }
+    .tab {
+      border: 0;
+      border-right: 1px solid #d7e8f1;
+      min-width: 140px;
+      padding: 9px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #5f6d76;
+      background: transparent;
+      cursor: pointer;
+    }
+    .tab:last-child { border-right: 0; }
+    .tab.active { background: var(--blue); color: #fff; }
+
+    .range-trigger {
+      flex-shrink: 0;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border-color: #d7e8f1;
+      color: #486172;
+      background: #f8fcfe;
+    }
+    .range-trigger.active {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+
+    .updated {
+      text-align: right;
+      color: #808993;
+      font-size: 12px;
+    }
+
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .kpi-card {
+      height: 140px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .kpi-title { font-size: 13px; color: #767d84; }
+    .kpi-value {
+      font-size: 50px;
+      line-height: 1;
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    .kpi-row .kpi-card:nth-child(1) .kpi-value { color: var(--blue); }
+    .kpi-row .kpi-card:nth-child(2) .kpi-value { color: var(--amber); }
+    .kpi-row .kpi-card:nth-child(3) .kpi-value { color: var(--red); }
+
+    .row-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .row-grid.single-col { grid-template-columns: 1fr; }
+    .row-grid.hidden-row { display: none; }
+
+    .widget {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .h-300 { height: 300px; }
+    .h-320 { height: 320px; }
+    .h-340 { height: 340px; }
+    .h-360 { height: 360px; }
+
+    .widget-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #595f65;
+      margin-bottom: 10px;
+      flex: 0 0 auto;
+    }
+
+    .widget-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+      padding-right: 2px;
+      display: flex;
+      flex-direction: column;
+    }
+    .widget-body.allow-scroll {
+      overflow: auto;
+    }
+
+    .widget-footer {
+      margin-top: 10px;
+      flex: 0 0 auto;
+    }
+    .generated-list {
+      margin: 0;
+      padding-left: 16px;
+      font-size: 13px;
+      color: #5b6670;
+      line-height: 1.35;
+    }
+    .generated-list li { margin-bottom: 6px; }
+    .generated-meta {
+      font-size: 12px;
+      color: #78838d;
+      margin-bottom: 8px;
+    }
+
+    .foot-link {
+      display: inline-block;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      padding: 6px 10px;
+      color: #7f8790;
+      text-decoration: none;
+      font-size: 12px;
+      background: #fafbfc;
+    }
+
+    .tiny-score {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .tiny-score > div { text-align: center; font-size: 13px; color: #666d73; }
+    .tiny-score strong {
+      display: block;
+      font-size: 24px;
+      line-height: 1.1;
+      margin-bottom: 2px;
+      font-weight: 700;
+    }
+
+    .service-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 13px;
+      color: #666d73;
+    }
+    .service-grid strong {
+      display: block;
+      font-size: 24px;
+      line-height: 1.1;
+      margin-top: 2px;
+    }
+
+    .mini-legend {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      font-size: 12px;
+      color: #757d85;
+      margin-bottom: 10px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+
+    .pill {
+      font-size: 12px;
+      border-radius: 12px;
+      padding: 3px 8px;
+      border: 1px solid;
+      white-space: nowrap;
+      display: inline-block;
+    }
+    .p-blue { color: var(--blue); border-color: #99daf3; background: #edf8fd; }
+    .p-green { color: var(--green); border-color: #b7dfca; background: #f1faf5; }
+    .p-amber { color: #d98c00; border-color: #ffd490; background: #fff8eb; }
+    .p-red { color: var(--red); border-color: #f1bec8; background: #fff1f3; }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      display: inline-block;
+      border: 1px solid #d9d9d9;
+    }
+
+    .table {
+      font-size: 13px;
+      margin-bottom: 0;
+    }
+    .table.table-sm > :not(caption) > * > * {
+      padding: 0.45rem 0.55rem;
+    }
+    .table thead th {
+      color: #727a82;
+      font-weight: 600;
+      background: #f7f8fa;
+    }
+
+    .table-scroll {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+    }
+    .table-scroll .table thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .chart-box {
+      border: 1px dashed #e2e5e8;
+      background: repeating-linear-gradient(to right, #fbfbfb, #fbfbfb 24px, #f4f4f4 24px, #f4f4f4 25px);
+      border-radius: 4px;
+      height: 100%;
+      min-height: 0;
+      padding: 6px;
+      flex: 1 1 auto;
+    }
+    .chart-box.chart-mini {
+      height: 150px;
+      flex: 0 0 150px;
+    }
+
+    .echart {
+      width: 100%;
+      height: 100%;
+      min-height: 180px;
+    }
+    .echart.echart-sm {
+      min-height: 0;
+    }
+    #widget-compliance {
+      height: 380px;
+    }
+    #widget-compliance .mini-legend {
+      margin-bottom: 6px;
+    }
+    #widget-compliance .widget-body {
+      overflow: visible;
+    }
+    #widget-compliance .chart-box {
+      min-height: 230px;
+      height: 230px;
+      flex: 0 0 230px;
+    }
+    #widget-compliance .echart {
+      min-height: 210px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 1480px) {
+      .dashboard { width: 100%; max-width: 1440px; }
+      .ai-shell { width: 100%; max-width: 1440px; }
+      .filters {
+        height: auto;
+        grid-template-columns: 1fr;
+      }
+      .updated { text-align: left; }
+      .tab { min-width: 0; flex: 1; }
+      .range-wrap { flex-direction: column; align-items: stretch; }
+      .ai-grid { grid-template-columns: 1fr 1fr; }
+      .ai-controls { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 1024px) {
+      .row-grid,
+      .kpi-row { grid-template-columns: 1fr; }
+      .hero-sub-row { flex-direction: column; align-items: flex-start; }
+      .ai-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <section class="ai-shell" id="aiShell">
+    <div class="ai-head">
+      <h1 class="ai-title">PPM AI Workspace</h1>
+      <p class="ai-sub">Planned Preventative Maintenance only. Use AI to generate and refine this PPM dashboard view.</p>
+    </div>
+    <div class="ai-grid" id="promptGrid">
+      <button type="button" class="prompt-chip" data-prompt="Show planned preventative maintenance compliance risks for the next 30 days.">PPM compliance risk review (30 days)</button>
+      <button type="button" class="prompt-chip" data-prompt="Focus on overdue planned preventative maintenance events and PM escalations.">Overdue PPM events and PM escalations</button>
+      <button type="button" class="prompt-chip" data-prompt="Build a planned preventative maintenance budget pressure dashboard focused on service charge overspend.">PPM budget pressure and overspend</button>
+      <button type="button" class="prompt-chip" data-prompt="Give me a planned preventative maintenance readiness dashboard for next quarter.">PPM readiness (next quarter)</button>
+    </div>
+    <div class="ai-controls">
+      <input id="aiPromptInput" class="ai-input" type="text" placeholder="Type your own PPM prompt, e.g. Prioritize overdue planned preventative maintenance checks." />
+      <button id="runAiPrompt" class="ai-run" type="button">Generate Dashboard</button>
+    </div>
+    <div class="ai-meta" id="aiMeta">No prompt applied yet.</div>
+  </section>
+
+  <main class="dashboard" id="dashboardRoot">
+    <section class="top-hero">
+      <button type="button" class="btn-close banner-close" id="dismissBanner" aria-label="Close event banner"></button>
+      <div class="hero-title" id="eventTitle">Upcoming event: Planned Water System Maintenance</div>
+      <div class="hero-sub-row">
+        <div>
+          <div class="hero-sub" id="eventDescription">Building: ECB Tower A | Wednesday, March 4, 2026 | 10:00 AM to 1:00 PM. Notify residents 24 hours before start.</div>
+          <div class="hero-event-meta"><span class="event-badge" id="eventBadge">Upcoming</span><span id="eventAudience">Audience: Property managers, residents, contractors</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="filters">
+      <label for="propertyFilter" class="sr-only">Select property</label>
+      <select id="propertyFilter" class="form-select">
+        <option value="all">All properties</option>
+        <option value="city">Sales City (PIC)</option>
+        <option value="ecb">ECB</option>
+        <option value="lol">LOL maintenance</option>
+      </select>
+
+      <label for="userFilter" class="sr-only">Select dashboard user</label>
+      <select id="userFilter" class="form-select">
+        <option value="me">My dashboard</option>
+        <option value="alex">Alex Morgan</option>
+        <option value="jamie">Jamie Patel</option>
+        <option value="sam">Sam Lee</option>
+      </select>
+
+      <div class="range-wrap">
+        <div class="tab-group" role="tablist" aria-label="Date range">
+          <button type="button" class="tab active" data-month="current" role="tab" aria-selected="true">Current month</button>
+          <button type="button" class="tab" data-month="next" role="tab" aria-selected="false">Next month</button>
+          <button type="button" class="tab" data-month="next6" role="tab" aria-selected="false">Next 6 months</button>
+        </div>
+        <input type="text" id="rangePickerInput" class="sr-only" aria-hidden="true" tabindex="-1">
+        <button type="button" id="rangeDropdownBtn" class="btn btn-outline-secondary btn-sm range-trigger">Custom range</button>
+      </div>
+
+      <div class="updated" id="updatedAt"><span id="updatedText">Last update at 24 Aug 2022 11:22 AM</span></div>
+    </section>
+
+    <section class="kpi-row">
+      <article class="kpi-card">
+        <div class="kpi-title">Upcoming events</div>
+        <div class="kpi-value" id="kpiUpcoming">21</div>
+      </article>
+      <article class="kpi-card">
+        <div class="kpi-title">Events past due date</div>
+        <div class="kpi-value" id="kpiPast">25</div>
+      </article>
+      <article class="kpi-card">
+        <div class="kpi-title">Events approaching due date</div>
+        <div class="kpi-value" id="kpiApproaching">15</div>
+      </article>
+    </section>
+
+    <section class="row-grid">
+      <article class="widget h-300" id="widget-comments">
+        <div class="widget-title">My comments</div>
+        <div class="widget-body">
+          <div class="tiny-score">
+            <div><strong style="color: var(--red);" id="commentUnread">2</strong>Unread</div>
+            <div><strong style="color: var(--blue);" id="commentRead">3</strong>Read</div>
+          </div>
+          <div class="table-scroll">
+            <table class="table table-sm align-middle">
+              <thead><tr><th>Contributive items in clear uploaded</th><th>Tenant</th><th></th></tr></thead>
+              <tbody id="commentsBody">
+                <tr><td>Tea filling required</td><td>Landlord</td><td><span class="pill p-blue">NEW</span></td></tr>
+                <tr><td>Electrical gate servicing visit</td><td>Contractor</td><td></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="widget-footer"><a href="#" class="foot-link">View all comments (22)</a></div>
+      </article>
+
+      <article class="widget h-300" id="widget-issues">
+        <div class="widget-title">Issues requiring attention</div>
+        <div class="widget-body">
+          <div class="table-scroll">
+            <table id="issuesTable" class="table table-sm align-middle">
+              <thead><tr><th>Status</th><th></th></tr></thead>
+              <tbody id="issuesBody">
+                <tr><td>Reported</td><td>5</td></tr>
+                <tr><td>Awaiting instructions</td><td>2</td></tr>
+                <tr><td>Awaiting FM confirmation</td><td>1</td></tr>
+                <tr><td>Job awarded, awaiting equipment date acceptance</td><td>5</td></tr>
+                <tr><td>Remedial issued</td><td>15</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="widget-footer"><a href="#" class="foot-link">View all issues (39)</a></div>
+      </article>
+    </section>
+
+    <section class="row-grid">
+      <article class="widget h-320" id="widget-compliance">
+        <div class="widget-title">Compliance by category</div>
+        <div class="widget-body">
+          <div class="mini-legend"><span><span class="dot" style="background: var(--red)"></span>Failed</span><span><span class="dot" style="background: var(--amber)"></span>Warning</span><span><span class="dot" style="background: var(--green)"></span>Passed</span></div>
+          <div class="chart-box"><div id="categoryChart" class="echart"></div></div>
+        </div>
+        <div class="widget-footer"><a href="#" class="foot-link">Compliance matrix</a></div>
+      </article>
+
+      <article class="widget h-320" id="widget-deadlines">
+        <div class="widget-title">Upcoming deadlines</div>
+        <div class="widget-body">
+          <div class="mini-legend"><span><span class="dot" style="background: var(--blue)"></span>Upcoming</span><span><span class="dot" style="background: var(--amber)"></span>Approaching due date</span><span><span class="dot" style="background: var(--red)"></span>Past due date</span></div>
+          <div class="table-scroll">
+            <table class="table table-sm align-middle">
+              <thead><tr><th>Site</th><th>Due</th><th></th></tr></thead>
+              <tbody id="deadlinesBody">
+                <tr><td>ECB</td><td>Dec 2025-01-20</td><td><span class="pill p-blue">2</span></td></tr>
+                <tr><td>Sales City (PIC)</td><td>Dec 2025-01-16</td><td><span class="pill p-red">6</span></td></tr>
+                <tr><td>LOLB inspection</td><td>Dec 2025-01-22</td><td><span class="pill p-amber">4</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="widget-footer"><a href="#" class="foot-link">View all sites (313)</a></div>
+      </article>
+    </section>
+
+    <section class="row-grid">
+      <article class="widget h-320" id="widget-risk">
+        <div class="widget-title">Higher risk buildings</div>
+        <div class="widget-body">
+          <div class="table-scroll">
+            <table class="table table-sm align-middle">
+              <thead><tr><th>Site</th><th>Critical</th><th>Overdue</th><th>Total</th><th>Risk</th></tr></thead>
+              <tbody id="riskBody">
+                <tr><td>Brookfield Mansion</td><td>8</td><td>1</td><td>3</td><td><span class="pill p-red">95%</span></td></tr>
+                <tr><td>Ten Benefits Estate</td><td>2</td><td>6</td><td>3</td><td><span class="pill p-amber">70%</span></td></tr>
+                <tr><td>The Aspire</td><td>1</td><td>3</td><td>1</td><td><span class="pill p-amber">60%</span></td></tr>
+                <tr><td>Elm Grove</td><td>0</td><td>2</td><td>2</td><td><span class="pill p-green">42%</span></td></tr>
+                <tr><td>Surrey Heights</td><td>0</td><td>1</td><td>2</td><td><span class="pill p-green">15%</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="widget-footer"><a href="#" class="foot-link">View all properties (118)</a></div>
+      </article>
+
+      <article class="widget h-320" id="widget-service">
+        <div class="widget-title">Service events compliance</div>
+        <div class="widget-body">
+          <div class="service-grid">
+            <div>Compliant<strong style="color: var(--green);" id="svcCompliant">16</strong></div>
+            <div>Due soon<strong style="color: var(--amber);" id="svcDueSoon">2</strong></div>
+            <div>Non-compliant<strong style="color: var(--red);" id="svcNon">3</strong></div>
+          </div>
+          <div class="table-scroll">
+            <table class="table table-sm align-middle">
+              <thead><tr><th>ECB</th><th>Due</th><th></th></tr></thead>
+              <tbody id="serviceBody">
+                <tr><td>FRA</td><td>Nov 2025-08-16</td><td><span class="pill p-amber">1</span></td></tr>
+                <tr><td>DSR</td><td>Nov 2025-08-04</td><td><span class="pill p-amber">2</span></td></tr>
+                <tr><td>Lift maintenance</td><td>Nov 2025-05-14</td><td><span class="pill p-red">1</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="widget-footer"><a href="#" class="foot-link">View all events (91)</a></div>
+      </article>
+    </section>
+
+    <section class="row-grid">
+      <article class="widget h-360" id="widget-inspection">
+        <div class="widget-title">Site inspection schedule</div>
+        <div class="widget-body">
+          <div class="mini-legend"><span><span class="dot" style="background:#2f9c5d"></span>Completed</span><span><span class="dot" style="background:#1f9dd6"></span>Scheduled</span><span><span class="dot" style="background:#d94c61"></span>Overdue</span></div>
+          <div class="chart-box"><div id="inspectionChart" class="echart"></div></div>
+        </div>
+        <div class="widget-footer"><a href="#" class="foot-link">View all schedules (83)</a></div>
+      </article>
+
+      <article class="widget h-360" id="widget-trend">
+        <div class="widget-title">Compliant trend <span style="font-size:12px;color:#888;">YoY</span></div>
+        <div class="widget-body">
+          <div class="mini-legend"><span><span class="dot" style="background:#2f9c5d"></span>Compliant rate</span><span><span class="dot" style="background:#1f9dd6"></span>Completed tasks</span></div>
+          <div class="chart-box"><div id="trendChart" class="echart"></div></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="row-grid">
+      <article class="widget h-340" id="widget-contracts">
+        <div class="widget-title">Planned maintenance contracts</div>
+        <div class="widget-body">
+          <div class="service-grid">
+            <div>Active<strong style="color: var(--green);" id="contractsActive">117</strong></div>
+            <div>Expiring soon<strong style="color: var(--amber);" id="contractsExpiring">35</strong></div>
+            <div>Inactive<strong style="color: var(--blue);" id="contractsInactive">13</strong></div>
+          </div>
+          <div class="table-scroll">
+            <table class="table table-sm align-middle">
+              <thead><tr><th>Category</th><th>Date</th><th></th></tr></thead>
+              <tbody id="contractsBody">
+                <tr><td>Cleaning contract</td><td>Ending 2025-09-10</td><td><span class="pill p-amber">warning</span></td></tr>
+                <tr><td>Ground maintenance contract</td><td>Ending 2025-06-11</td><td><span class="pill p-red">critical</span></td></tr>
+                <tr><td>Annual fire risk assessment</td><td>Ending 2025-05-10</td><td><span class="pill p-red">critical</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="widget-footer"><a href="#" class="foot-link">View all service agreement (76)</a></div>
+      </article>
+
+      <article class="widget h-340" id="widget-assets">
+        <div class="widget-title">Assets overview</div>
+        <div class="widget-body">
+          <div class="service-grid">
+            <div>Total<strong id="assetsTotal">1187</strong></div>
+            <div>At risk<strong style="color: var(--amber);" id="assetsRisk">35</strong></div>
+            <div>Non-compliant<strong style="color: var(--red);" id="assetsNon">3</strong></div>
+          </div>
+          <div class="table-scroll">
+            <table class="table table-sm align-middle">
+              <thead><tr><th>Type</th><th>Total</th><th>Compliant</th><th>At risk</th><th>Non-compliant</th></tr></thead>
+              <tbody id="assetsBody">
+                <tr><td>Fire Safety</td><td>544</td><td><span class="status-dot" style="background:#2f9c5d"></span></td><td><span class="status-dot" style="background:#ff9f1c"></span></td><td><span class="status-dot" style="background:#d94c61"></span></td></tr>
+                <tr><td>HVAC</td><td>361</td><td><span class="status-dot" style="background:#2f9c5d"></span></td><td><span class="status-dot" style="background:#ff9f1c"></span></td><td><span class="status-dot" style="background:#d94c61"></span></td></tr>
+                <tr><td>Electrical</td><td>282</td><td><span class="status-dot" style="background:#2f9c5d"></span></td><td><span class="status-dot" style="background:#ff9f1c"></span></td><td><span class="status-dot" style="background:#d94c61"></span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="widget-footer"><a href="#" class="foot-link">View all assets (1157)</a></div>
+      </article>
+    </section>
+
+    <section class="row-grid" style="margin-bottom:0;">
+      <article class="widget h-320" id="widget-budgets">
+        <div class="widget-title">Service charge budgets</div>
+        <div class="widget-body">
+          <div class="service-grid">
+            <div>Budgeted<strong style="color: var(--blue);">15</strong></div>
+            <div>Over-spending<strong style="color: var(--amber);">8</strong></div>
+            <div>Budget concern<strong style="color: var(--red);">5</strong></div>
+          </div>
+          <div class="chart-box"><div id="budgetChart" class="echart"></div></div>
+        </div>
+        <div class="widget-footer"><a href="#" class="foot-link">View all service charge budgets (35)</a></div>
+      </article>
+      <div></div>
+    </section>
+
+    <section class="row-grid hidden" id="dynamicWidgetsRow" style="margin-top:12px;margin-bottom:0;"></section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
+  <script>
+    const models = {
+      all: {
+        current: { kpi: [21, 25, 15], service: [16, 2, 3], contracts: [117, 35, 13], assets: [1187, 35, 3] },
+        next: { kpi: [19, 21, 17], service: [14, 3, 4], contracts: [113, 38, 14], assets: [1187, 37, 5] },
+        next6: { kpi: [43, 52, 24], service: [52, 11, 7], contracts: [108, 42, 15], assets: [1187, 44, 8] }
+      },
+      city: {
+        current: { kpi: [12, 15, 7], service: [9, 1, 2], contracts: [66, 18, 7], assets: [451, 13, 1] },
+        next: { kpi: [11, 13, 8], service: [8, 2, 2], contracts: [64, 19, 8], assets: [451, 14, 2] },
+        next6: { kpi: [27, 31, 12], service: [29, 6, 4], contracts: [59, 25, 9], assets: [451, 19, 3] }
+      },
+      ecb: {
+        current: { kpi: [5, 6, 4], service: [4, 1, 1], contracts: [31, 8, 3], assets: [292, 11, 1] },
+        next: { kpi: [5, 5, 5], service: [3, 2, 1], contracts: [29, 9, 4], assets: [292, 12, 2] },
+        next6: { kpi: [9, 14, 6], service: [12, 4, 2], contracts: [27, 11, 5], assets: [292, 15, 3] }
+      },
+      lol: {
+        current: { kpi: [4, 4, 4], service: [3, 0, 1], contracts: [20, 9, 3], assets: [198, 7, 1] },
+        next: { kpi: [3, 3, 4], service: [3, 0, 1], contracts: [20, 8, 4], assets: [198, 8, 1] },
+        next6: { kpi: [7, 7, 6], service: [11, 1, 1], contracts: [22, 6, 4], assets: [198, 10, 2] }
+      }
+    };
+
+    const baseCategories = [
+      { name: 'FRA', value: 28, color: '#d94c61' },
+      { name: 'Gas Safety (CP12)', value: 46, color: '#d94c61' },
+      { name: 'Electrical', value: 62, color: '#ff9f1c' },
+      { name: 'Asbestos Assessment', value: 71, color: '#ff9f1c' },
+      { name: 'LOLER', value: 88, color: '#2f9c5d' }
+    ];
+
+    const baseBudgets = [
+      ['Budget 1', 62],
+      ['Budget 2', 48],
+      ['Budget 3', 79],
+      ['Budget 4', 69],
+      ['Budget 5', 88]
+    ];
+
+    const baseInspections = [
+      [20, 34, 10], [11, 42, 12], [8, 31, 14], [18, 15, 7], [22, 34, 9],
+      [12, 22, 10], [9, 40, 11], [13, 26, 8], [18, 38, 14], [14, 33, 9]
+    ];
+
+    const baseInspectionPms = [
+      ['PM 1, PM 4', 'PM 1, PM 2, PM 3', 'PM 1, PM 2'],
+      ['PM 2, PM 4', 'PM 2, PM 3', 'PM 1'],
+      ['PM 3', 'PM 1, PM 3', 'PM 2, PM 4'],
+      ['PM 1, PM 2', 'PM 2, PM 4', 'PM 3'],
+      ['PM 4', 'PM 1, PM 2, PM 3', 'PM 1, PM 4'],
+      ['PM 1', 'PM 2, PM 3', 'PM 2'],
+      ['PM 2, PM 3', 'PM 1, PM 4', 'PM 1, PM 3'],
+      ['PM 4', 'PM 1, PM 2', 'PM 2, PM 3'],
+      ['PM 1, PM 3', 'PM 2, PM 4', 'PM 1, PM 2'],
+      ['PM 2', 'PM 1, PM 3, PM 4', 'PM 1, PM 4']
+    ];
+
+    let categories = [...baseCategories];
+    let budgets = [...baseBudgets];
+    let inspections = [...baseInspections];
+    let inspectionPms = [...baseInspectionPms];
+
+    const aiScenarios = {
+      compliance: {
+        id: 'compliance',
+        label: 'Critical compliance risk review',
+        focusWidgets: ['widget-compliance', 'widget-risk', 'widget-deadlines', 'widget-inspection', 'widget-service', 'widget-issues'],
+        eventTitle: 'Upcoming event: Fire Safety Escalation Meeting',
+        eventDescription: 'Building: Brookfield Mansion | Friday, February 27, 2026 | 9:30 AM to 11:00 AM. Review overdue statutory checks and action owners.',
+        eventBadge: 'Critical',
+        eventAudience: 'Audience: Property managers, compliance leads, FM operations',
+        weights: { kpi: 1.22, service: 1.15, contracts: 1.12, assetsRisk: 1.2 },
+        comments: { unread: 6, read: 8, rows: [['Fire alarm certification missing evidence', 'Landlord', 'NEW'], ['Gas safety certificate expired', 'Contractor', '']] },
+        issues: [['Reported', 8], ['Awaiting instructions', 3], ['Awaiting FM confirmation', 4], ['Job awarded, awaiting equipment date acceptance', 6], ['Remedial issued', 21]],
+        deadlines: [['Brookfield Mansion', 'Mar 2026-03-02', 'p-red', '8'], ['The Aspire', 'Mar 2026-03-05', 'p-amber', '4'], ['ECB', 'Mar 2026-03-06', 'p-blue', '2']],
+        risks: [['Brookfield Mansion', 11, 4, 7, 'p-red', '98%'], ['Ten Benefits Estate', 5, 8, 6, 'p-red', '92%'], ['Surrey Heights', 3, 4, 2, 'p-amber', '76%']],
+        services: [['Emergency lighting', 'Feb 2026-02-28', 'p-red', '4'], ['FRA', 'Mar 2026-03-04', 'p-amber', '3'], ['Water hygiene', 'Mar 2026-03-07', 'p-amber', '2']],
+        generated: [
+          { title: 'AI Priority Actions', points: ['Escalate properties with 3+ overdue statutory items.', 'Assign named PM owner for each red-risk site.', 'Lock remediation due dates within 7 days.'] },
+          { title: 'AI Compliance Narrative', points: ['Primary pressure is around fire safety and remedials.', 'Risk concentration is in high-density mixed-use buildings.', 'Weekly checkpoint cadence is recommended.'] }
+        ]
+      },
+      overdue: {
+        id: 'overdue',
+        label: 'Overdue events and PM escalations',
+        focusWidgets: ['widget-issues', 'widget-deadlines', 'widget-risk', 'widget-service', 'widget-inspection', 'widget-comments'],
+        eventTitle: 'Upcoming event: PM Escalation Board',
+        eventDescription: 'Portfolio: Multi-site | Thursday, February 26, 2026 | 2:00 PM to 3:30 PM. Review all overdue PPM events by property manager.',
+        eventBadge: 'Action needed',
+        eventAudience: 'Audience: Regional PMs and escalation desk',
+        weights: { kpi: 1.3, service: 1.34, contracts: 1.06, assetsRisk: 1.1 },
+        comments: { unread: 9, read: 4, rows: [['Escalation requested for lift maintenance', 'Landlord', 'NEW'], ['Overdue due-date accepted without evidence', 'Contractor', 'NEW']] },
+        issues: [['Reported', 11], ['Awaiting instructions', 5], ['Awaiting FM confirmation', 3], ['Job awarded, awaiting equipment date acceptance', 9], ['Remedial issued', 26]],
+        deadlines: [['Sales City (PIC)', 'Feb 2026-02-25', 'p-red', '9'], ['ECB', 'Feb 2026-02-27', 'p-amber', '5'], ['LOLB inspection', 'Mar 2026-03-01', 'p-amber', '4']],
+        risks: [['Ten Benefits Estate', 7, 9, 7, 'p-red', '94%'], ['Brookfield Mansion', 9, 5, 6, 'p-red', '91%'], ['Elm Grove', 3, 6, 4, 'p-amber', '74%']],
+        services: [['Lift maintenance', 'Feb 2026-02-24', 'p-red', '5'], ['FRA', 'Feb 2026-02-26', 'p-red', '3'], ['DSR', 'Mar 2026-03-02', 'p-amber', '2']],
+        generated: [
+          { title: 'AI Escalation Queue', points: ['Top PM backlog should be triaged first.', 'Bundle overdue tasks by contractor to accelerate closeout.', 'Enable daily stand-up for escalated items only.'] },
+          { title: 'AI SLA Risk Watch', points: ['SLA breach risk is highest in lift and FRA workstreams.', 'Awaiting-instruction queue is now material to cycle time.', 'Track mean days overdue by PM weekly.'] }
+        ]
+      },
+      budget: {
+        id: 'budget',
+        label: 'Budget pressure and overspend overview',
+        focusWidgets: ['widget-budgets', 'widget-contracts', 'widget-assets', 'widget-service', 'widget-deadlines'],
+        eventTitle: 'Upcoming event: Service Charge Forecast Review',
+        eventDescription: 'Portfolio finance sync | Monday, March 2, 2026 | 1:00 PM to 2:00 PM. Validate high-cost contracts and mitigation actions.',
+        eventBadge: 'Financial focus',
+        eventAudience: 'Audience: Asset managers, PM finance owners',
+        weights: { kpi: 0.95, service: 1.08, contracts: 1.28, assetsRisk: 1.15 },
+        comments: { unread: 4, read: 10, rows: [['Budget variance commentary requested', 'Landlord', 'NEW'], ['Ground maintenance quote exceeded baseline', 'Contractor', '']] },
+        issues: [['Reported', 4], ['Awaiting instructions', 3], ['Awaiting FM confirmation', 2], ['Job awarded, awaiting equipment date acceptance', 8], ['Remedial issued', 11]],
+        deadlines: [['ECB', 'Mar 2026-03-10', 'p-blue', '2'], ['Surrey Heights', 'Mar 2026-03-11', 'p-amber', '3'], ['Ten Benefits Estate', 'Mar 2026-03-09', 'p-red', '6']],
+        risks: [['Ten Benefits Estate', 6, 5, 7, 'p-red', '90%'], ['The Aspire', 3, 4, 5, 'p-amber', '68%'], ['Elm Grove', 1, 3, 3, 'p-green', '39%']],
+        services: [['Cleaning contract', 'Mar 2026-03-08', 'p-amber', '3'], ['Ground maintenance', 'Mar 2026-03-05', 'p-red', '4'], ['Waste disposal', 'Mar 2026-03-12', 'p-amber', '2']],
+        generated: [
+          { title: 'AI Cost Controls', points: ['Re-negotiate top two overrun contracts this month.', 'Shift non-critical tasks to next cycle where safe.', 'Prioritize repairs with highest resident impact per dollar.'] },
+          { title: 'AI Budget Forecast', points: ['Projected overspend trend remains elevated next 6 weeks.', 'Ground and cleaning categories drive most variance.', 'Introduce pre-approval threshold for emergency spend.'] }
+        ]
+      },
+      readiness: {
+        id: 'readiness',
+        label: 'Preventive maintenance readiness',
+        focusWidgets: ['widget-inspection', 'widget-trend', 'widget-contracts', 'widget-compliance', 'widget-service'],
+        eventTitle: 'Upcoming event: Preventive Readiness Checkpoint',
+        eventDescription: 'Quarter kickoff | Tuesday, March 3, 2026 | 11:00 AM to 12:00 PM. Validate scheduling readiness for statutory tasks.',
+        eventBadge: 'Planning',
+        eventAudience: 'Audience: PMs, planners, operations team',
+        weights: { kpi: 0.9, service: 0.88, contracts: 1.05, assetsRisk: 0.95 },
+        comments: { unread: 3, read: 11, rows: [['Q2 readiness plan uploaded for review', 'Landlord', 'NEW'], ['Preventive checks sequencing confirmed', 'Contractor', '']] },
+        issues: [['Reported', 3], ['Awaiting instructions', 1], ['Awaiting FM confirmation', 1], ['Job awarded, awaiting equipment date acceptance', 4], ['Remedial issued', 8]],
+        deadlines: [['ECB', 'Apr 2026-04-02', 'p-blue', '2'], ['Sales City (PIC)', 'Apr 2026-04-04', 'p-amber', '3'], ['LOLB inspection', 'Apr 2026-04-07', 'p-blue', '1']],
+        risks: [['Brookfield Mansion', 4, 2, 4, 'p-amber', '66%'], ['The Aspire', 2, 2, 3, 'p-amber', '58%'], ['Surrey Heights', 1, 1, 2, 'p-green', '31%']],
+        services: [['FRA', 'Apr 2026-04-06', 'p-blue', '1'], ['DSR', 'Apr 2026-04-08', 'p-blue', '1'], ['Water hygiene', 'Apr 2026-04-09', 'p-amber', '2']],
+        generated: [
+          { title: 'AI Readiness Checklist', points: ['Confirm contractor slot coverage for all planned visits.', 'Validate document templates for statutory evidence.', 'Pre-notify residents for all high-impact maintenance windows.'] },
+          { title: 'AI Capacity View', points: ['Current PM load supports planned cadence.', 'Readiness risk mainly tied to seasonal contractor demand.', 'Pull-forward low-risk tasks where capacity exists.'] }
+        ]
+      }
+    };
+
+    let property = 'all';
+    let month = 'current';
+    let selectedUser = 'me';
+    let customRange = { from: null, to: null };
+    let activeScenario = aiScenarios.readiness;
+    let lastAiPrompt = '';
+    let dynamicCharts = [];
+
+    const allWidgetIds = [
+      'widget-comments', 'widget-issues', 'widget-compliance', 'widget-deadlines',
+      'widget-risk', 'widget-service', 'widget-inspection', 'widget-trend',
+      'widget-contracts', 'widget-assets', 'widget-budgets'
+    ];
+
+    const userScale = {
+      me: 1,
+      alex: 1.08,
+      jamie: 0.93,
+      sam: 1.15
+    };
+
+    const categoryChart = echarts.init(document.getElementById('categoryChart'));
+    const inspectionChart = echarts.init(document.getElementById('inspectionChart'));
+    const trendChart = echarts.init(document.getElementById('trendChart'));
+    const budgetChart = echarts.init(document.getElementById('budgetChart'));
+
+    function renderRows(targetId, rows, mapFn) {
+      const host = document.getElementById(targetId);
+      host.innerHTML = rows.map(mapFn).join('');
+    }
+
+    function applyScenarioVisuals(scenario) {
+      document.getElementById('eventTitle').textContent = scenario.eventTitle;
+      document.getElementById('eventDescription').textContent = scenario.eventDescription;
+      document.getElementById('eventBadge').textContent = scenario.eventBadge;
+      document.getElementById('eventAudience').textContent = scenario.eventAudience;
+
+      document.getElementById('commentUnread').textContent = scenario.comments.unread;
+      document.getElementById('commentRead').textContent = scenario.comments.read;
+
+      renderRows('commentsBody', scenario.comments.rows, ([item, tenant, badge]) => `
+        <tr><td>${item}</td><td>${tenant}</td><td>${badge ? `<span class="pill p-blue">${badge}</span>` : ''}</td></tr>
+      `);
+      renderRows('issuesBody', scenario.issues, ([status, count]) => `<tr><td>${status}</td><td>${count}</td></tr>`);
+      renderRows('deadlinesBody', scenario.deadlines, ([site, due, pillClass, val]) => `<tr><td>${site}</td><td>${due}</td><td><span class="pill ${pillClass}">${val}</span></td></tr>`);
+      renderRows('riskBody', scenario.risks, ([site, critical, overdue, total, riskClass, risk]) => `<tr><td>${site}</td><td>${critical}</td><td>${overdue}</td><td>${total}</td><td><span class="pill ${riskClass}">${risk}</span></td></tr>`);
+      renderRows('serviceBody', scenario.services, ([name, due, pillClass, val]) => `<tr><td>${name}</td><td>${due}</td><td><span class="pill ${pillClass}">${val}</span></td></tr>`);
+
+      categories = baseCategories.map((c, idx) => ({ ...c, value: Math.min(99, Math.round(c.value * (scenario.weights.kpi * (0.82 + idx * 0.04)))) }));
+      budgets = baseBudgets.map(([name, value], idx) => [name, Math.min(99, Math.round(value * (scenario.weights.contracts * (0.9 + idx * 0.02))))]);
+      inspections = baseInspections.map(([a, b, c]) => [Math.round(a * scenario.weights.service), Math.round(b * scenario.weights.service), Math.round(c * scenario.weights.kpi)]);
+      inspectionPms = [...baseInspectionPms];
+      renderCategoryChart();
+      renderInspectionChart();
+      renderTrendChart();
+      renderBudgetChart();
+    }
+
+    function detectScenario(prompt) {
+      const q = `planned preventative maintenance ${prompt.toLowerCase()}`;
+      if (q.includes('budget') || q.includes('overspend') || q.includes('cost') || q.includes('service charge')) return aiScenarios.budget;
+      if (q.includes('overdue') || q.includes('escalation') || q.includes('urgent')) return aiScenarios.overdue;
+      if (q.includes('ready') || q.includes('preventive') || q.includes('quarter') || q.includes('plan')) return aiScenarios.readiness;
+      return aiScenarios.compliance;
+    }
+
+    function getSelectionDrivenWidgets() {
+      const ids = new Set(activeScenario.focusWidgets || allWidgetIds);
+      if (property === 'ecb') {
+        ids.add('widget-service');
+        ids.add('widget-deadlines');
+      }
+      if (property === 'city') {
+        ids.add('widget-risk');
+        ids.add('widget-comments');
+      }
+      if (selectedUser === 'alex') {
+        ids.add('widget-trend');
+      }
+      if (selectedUser === 'sam') {
+        ids.add('widget-issues');
+        ids.add('widget-inspection');
+      }
+      if (month === 'custom' || month === 'next6') {
+        ids.add('widget-deadlines');
+        ids.add('widget-contracts');
+      }
+      return ids;
+    }
+
+    function applyWidgetFiltering() {
+      const visible = getSelectionDrivenWidgets();
+      allWidgetIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.toggle('hidden', !visible.has(id));
+      });
+      compactWidgetRows();
+    }
+
+    function compactWidgetRows() {
+      document.querySelectorAll('.row-grid').forEach(row => {
+        const widgets = [...row.children].filter(el => el.classList && el.classList.contains('widget') && !el.classList.contains('hidden'));
+        row.classList.toggle('hidden-row', widgets.length === 0);
+        row.classList.toggle('single-col', widgets.length <= 1);
+      });
+    }
+
+    function resizeAllCharts() {
+      categoryChart.resize();
+      inspectionChart.resize();
+      trendChart.resize();
+      budgetChart.resize();
+      dynamicCharts.forEach(chart => chart.resize());
+    }
+
+    function resizeAllChartsDeferred() {
+      requestAnimationFrame(() => {
+        resizeAllCharts();
+        requestAnimationFrame(() => resizeAllCharts());
+      });
+    }
+
+    function disposeDynamicCharts() {
+      dynamicCharts.forEach(chart => chart.dispose());
+      dynamicCharts = [];
+    }
+
+    function renderDynamicWidgets(prompt) {
+      const row = document.getElementById('dynamicWidgetsRow');
+      const scope = property === 'all' ? 'Portfolio' : document.getElementById('propertyFilter').selectedOptions[0].textContent;
+      const owner = document.getElementById('userFilter').selectedOptions[0].textContent;
+      const data = getDataForPeriod();
+      disposeDynamicCharts();
+      const blocks = (activeScenario.generated || []).map(item => ({
+        title: item.title,
+        points: item.points
+      }));
+      blocks.push({
+        title: 'AI Context Applied',
+        points: [
+          `Prompt focus: ${prompt || activeScenario.label}.`,
+          `Scope: ${scope}.`,
+          `Owner view: ${owner}.`
+        ]
+      });
+
+      row.innerHTML = blocks.slice(0, 2).map((block, idx) => `
+        <article class="widget h-320">
+          <div class="widget-title">${block.title}</div>
+          <div class="widget-body">
+            <div class="generated-meta">Generated from current prompt and selection filters.</div>
+            <div class="chart-box chart-mini"><div id="dynamicChart${idx}" class="echart echart-sm"></div></div>
+            <ul class="generated-list">
+              ${block.points.map(p => `<li>${p}</li>`).join('')}
+            </ul>
+          </div>
+          <div class="widget-footer"><a href="#" class="foot-link">View AI details</a></div>
+        </article>
+      `).join('');
+
+      row.classList.remove('hidden');
+      compactWidgetRows();
+
+      const chart0 = echarts.init(document.getElementById('dynamicChart0'));
+      chart0.setOption({
+        animationDuration: 300,
+        tooltip: { trigger: 'axis' },
+        grid: { left: 28, right: 10, top: 12, bottom: 18 },
+        xAxis: { type: 'category', data: ['Upcoming', 'Past due', 'Due soon'], axisLabel: { fontSize: 10 } },
+        yAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#eceff1' } } },
+        series: [{ type: 'bar', barWidth: 20, itemStyle: { color: '#169fdd', borderRadius: [6, 6, 0, 0] }, data: data.kpi }]
+      });
+
+      const chart1 = echarts.init(document.getElementById('dynamicChart1'));
+      chart1.setOption({
+        animationDuration: 300,
+        tooltip: { trigger: 'axis' },
+        grid: { left: 28, right: 10, top: 12, bottom: 18 },
+        xAxis: { type: 'category', data: ['Compliant', 'Due soon', 'Non-compliant'], axisLabel: { fontSize: 10 } },
+        yAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#eceff1' } } },
+        series: [{
+          type: 'line',
+          smooth: true,
+          symbolSize: 6,
+          lineStyle: { width: 2, color: '#2f9c5d' },
+          itemStyle: { color: '#2f9c5d' },
+          data: data.service
+        }]
+      });
+
+      dynamicCharts.push(chart0, chart1);
+    }
+
+    function renderCategoryChart() {
+      categoryChart.setOption({
+        animationDuration: 350,
+        grid: { left: 124, right: 20, top: 10, bottom: 24, containLabel: true },
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        xAxis: {
+          type: 'value',
+          min: 0,
+          max: 100,
+          axisLabel: { color: '#6f6f6f', fontSize: 11, formatter: '{value}%' },
+          splitLine: { lineStyle: { color: '#eceff1' } }
+        },
+        yAxis: {
+          type: 'category',
+          inverse: true,
+          axisLabel: { color: '#646464', fontSize: 11 },
+          axisLine: { show: false },
+          axisTick: { show: false },
+          data: categories.map(item => item.name)
+        },
+        series: [{
+          type: 'bar',
+          barWidth: 11,
+          barCategoryGap: '45%',
+          data: categories.map(item => ({ value: item.value, itemStyle: { color: item.color, borderRadius: [0, 8, 8, 0] } })),
+          label: { show: true, position: 'right', color: '#666', fontSize: 10, formatter: '{c}%' }
+        }]
+      });
+    }
+
+    function renderInspectionChart() {
+      const labels = inspections.map((_, idx) => `W${idx + 1}`);
+      inspectionChart.setOption({
+        animationDuration: 350,
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: { type: 'shadow' },
+          backgroundColor: '#f7f8fa',
+          borderColor: '#dfe3e8',
+          borderWidth: 1,
+          textStyle: { color: '#646d77', fontSize: 11 },
+          extraCssText: 'border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.1);padding:8px 10px;',
+          formatter: params => {
+            const sorted = [...params].sort((a, b) => a.seriesIndex - b.seriesIndex);
+            const rows = sorted.map((p, i) => {
+              const pmText = p.data.pm || 'PM 1';
+              const border = i < sorted.length - 1 ? 'border-bottom:1px solid #c8ced6;' : '';
+              return `<div style="display:grid;grid-template-columns:18px 32px 1fr;gap:8px;align-items:center;padding:8px 2px;${border}">
+                <span style="width:12px;height:12px;border-radius:50%;background:${p.color};display:inline-block"></span>
+                <span style="font-size:20px;line-height:1;color:#5f6873">${p.value}</span>
+                <span style="font-size:20px;line-height:1.2;color:#5f6873">${pmText}</span>
+              </div>`;
+            }).join('');
+            return `<div style="min-width:280px">${rows}</div>`;
+          }
+        },
+        grid: { left: 42, right: 14, top: 14, bottom: 22 },
+        xAxis: {
+          type: 'category',
+          data: labels,
+          axisLabel: { color: '#6f6f6f', fontSize: 10 },
+          axisLine: { lineStyle: { color: '#d9d9d9' } }
+        },
+        yAxis: {
+          type: 'value',
+          axisLabel: { color: '#6f6f6f', fontSize: 10 },
+          splitLine: { lineStyle: { color: '#eceff1' } }
+        },
+        series: [
+          { name: 'Completed', type: 'bar', stack: 'total', barMaxWidth: 14, itemStyle: { color: '#2f9c5d' }, data: inspections.map((v, idx) => ({ value: v[0], pm: inspectionPms[idx][0] })) },
+          { name: 'Scheduled', type: 'bar', stack: 'total', barMaxWidth: 14, itemStyle: { color: '#1f9dd6' }, data: inspections.map((v, idx) => ({ value: v[1], pm: inspectionPms[idx][1] })) },
+          { name: 'Overdue', type: 'bar', stack: 'total', barMaxWidth: 14, itemStyle: { color: '#d94c61' }, data: inspections.map((v, idx) => ({ value: v[2], pm: inspectionPms[idx][2] })) }
+        ]
+      });
+    }
+
+    function renderTrendChart() {
+      trendChart.setOption({
+        animationDuration: 350,
+        tooltip: { trigger: 'axis' },
+        grid: { left: 42, right: 18, top: 14, bottom: 22 },
+        xAxis: {
+          type: 'category',
+          data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          axisLabel: { color: '#6f6f6f', fontSize: 10 },
+          axisLine: { lineStyle: { color: '#d9d9d9' } }
+        },
+        yAxis: {
+          type: 'value',
+          axisLabel: { color: '#6f6f6f', fontSize: 10 },
+          splitLine: { lineStyle: { color: '#eceff1' } }
+        },
+        series: [
+          { name: 'Compliant rate', type: 'line', smooth: true, symbolSize: 7, lineStyle: { width: 2 }, itemStyle: { color: '#2f9c5d' }, data: [79, 84, 82, 86, 81, 85] },
+          { name: 'Completed tasks', type: 'line', smooth: true, symbolSize: 7, lineStyle: { width: 2 }, itemStyle: { color: '#1f9dd6' }, data: [72, 75, 73, 71, 76, 70] }
+        ]
+      });
+    }
+
+    function renderBudgetChart() {
+      budgetChart.setOption({
+        animationDuration: 350,
+        tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+        grid: { left: 76, right: 14, top: 14, bottom: 16 },
+        xAxis: {
+          type: 'value',
+          axisLabel: { color: '#6f6f6f', fontSize: 10, formatter: '{value}%' },
+          splitLine: { lineStyle: { color: '#eceff1' } }
+        },
+        yAxis: {
+          type: 'category',
+          inverse: true,
+          axisLabel: { color: '#646464', fontSize: 10 },
+          axisLine: { show: false },
+          axisTick: { show: false },
+          data: budgets.map(item => item[0])
+        },
+        series: [{
+          type: 'bar',
+          barWidth: 12,
+          data: budgets.map(item => item[1]),
+          itemStyle: { color: '#1f9dd6', borderRadius: [0, 8, 8, 0] },
+          label: { show: true, position: 'right', color: '#666', fontSize: 10, formatter: '{c}%' }
+        }]
+      });
+    }
+
+    function scaleValues(values, factor) {
+      return values.map(v => Math.max(0, Math.round(v * factor)));
+    }
+
+    function getCustomMonthSpan() {
+      if (!customRange.from || !customRange.to) return 1;
+      const from = new Date(customRange.from);
+      const to = new Date(customRange.to);
+      if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime()) || to < from) return 1;
+      const diffDays = Math.floor((to - from) / 86400000) + 1;
+      const span = diffDays / 30;
+      return Math.max(1, Math.min(12, Number(span.toFixed(2))));
+    }
+
+    function getDataForPeriod() {
+      const weights = activeScenario.weights;
+      const weighted = source => ({
+        kpi: scaleValues(source.kpi, weights.kpi),
+        service: scaleValues(source.service, weights.service),
+        contracts: scaleValues(source.contracts, weights.contracts),
+        assets: [source.assets[0], ...scaleValues(source.assets.slice(1), weights.assetsRisk)]
+      });
+      if (month !== 'custom') return weighted(models[property][month]);
+      const base = models[property].current;
+      const span = getCustomMonthSpan();
+      return {
+        kpi: scaleValues(base.kpi, span * weights.kpi),
+        service: scaleValues(base.service, Math.max(1, span * 0.9) * weights.service),
+        contracts: scaleValues(base.contracts, Math.max(1, span * 0.65) * weights.contracts),
+        assets: [base.assets[0], ...scaleValues(base.assets.slice(1), Math.max(1, span * 0.5) * weights.assetsRisk)]
+      };
+    }
+
+    function updateKpis() {
+      const data = getDataForPeriod();
+      const factor = userScale[selectedUser] || 1;
+      const [u, p, a] = scaleValues(data.kpi, factor);
+      const [svcC, svcD, svcN] = scaleValues(data.service, factor);
+      const [conA, conE, conI] = scaleValues(data.contracts, factor);
+      const [astT, astR, astN] = scaleValues(data.assets, factor);
+
+      document.getElementById('kpiUpcoming').textContent = u;
+      document.getElementById('kpiPast').textContent = p;
+      document.getElementById('kpiApproaching').textContent = a;
+      document.getElementById('svcCompliant').textContent = svcC;
+      document.getElementById('svcDueSoon').textContent = svcD;
+      document.getElementById('svcNon').textContent = svcN;
+      document.getElementById('contractsActive').textContent = conA;
+      document.getElementById('contractsExpiring').textContent = conE;
+      document.getElementById('contractsInactive').textContent = conI;
+      document.getElementById('assetsTotal').textContent = astT;
+      document.getElementById('assetsRisk').textContent = astR;
+      document.getElementById('assetsNon').textContent = astN;
+      document.getElementById('updatedText').textContent = `Last update at ${new Date().toLocaleString()}`;
+    }
+
+    function runAiPrompt(prompt) {
+      const trimmed = prompt.trim();
+      if (!trimmed) return;
+      lastAiPrompt = trimmed;
+      activeScenario = detectScenario(trimmed);
+      applyScenarioVisuals(activeScenario);
+      applyWidgetFiltering();
+      renderDynamicWidgets(trimmed);
+      updateKpis();
+      resizeAllChartsDeferred();
+      document.getElementById('aiMeta').textContent = `Generated using prompt: "${trimmed}" (${activeScenario.label})`;
+    }
+
+    document.querySelectorAll('.tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        month = btn.dataset.month;
+        document.getElementById('rangeDropdownBtn').classList.remove('active');
+        applyWidgetFiltering();
+        renderDynamicWidgets(lastAiPrompt || activeScenario.label);
+        updateKpis();
+        resizeAllChartsDeferred();
+      });
+    });
+
+    document.getElementById('propertyFilter').addEventListener('change', e => {
+      property = e.target.value;
+      applyWidgetFiltering();
+      renderDynamicWidgets(lastAiPrompt || activeScenario.label);
+      updateKpis();
+      resizeAllChartsDeferred();
+    });
+
+    document.getElementById('userFilter').addEventListener('change', e => {
+      selectedUser = e.target.value;
+      applyWidgetFiltering();
+      renderDynamicWidgets(lastAiPrompt || activeScenario.label);
+      updateKpis();
+      resizeAllChartsDeferred();
+    });
+
+    document.getElementById('dismissBanner').addEventListener('click', () => {
+      const banner = document.querySelector('.top-hero');
+      banner.style.display = 'none';
+    });
+
+    document.getElementById('issuesBody').addEventListener('click', e => {
+      const row = e.target.closest('tr');
+      if (!row) return;
+      document.querySelectorAll('#issuesBody tr').forEach(r => r.style.background = '');
+      row.style.background = '#eef8fc';
+    });
+
+    document.querySelectorAll('.prompt-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.prompt-chip').forEach(el => el.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('aiPromptInput').value = btn.dataset.prompt;
+      });
+    });
+
+    document.getElementById('runAiPrompt').addEventListener('click', () => {
+      runAiPrompt(document.getElementById('aiPromptInput').value);
+    });
+
+    document.getElementById('aiPromptInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') runAiPrompt(e.target.value);
+    });
+
+    const today = new Date();
+    const toIso = d => {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    };
+    customRange = { from: null, to: null };
+    document.getElementById('rangeDropdownBtn').textContent = 'Custom range';
+
+    const rangeInput = document.getElementById('rangePickerInput');
+    const rangeBtn = document.getElementById('rangeDropdownBtn');
+    const picker = new Litepicker({
+      element: rangeInput,
+      singleMode: false,
+      numberOfMonths: 2,
+      numberOfColumns: 2,
+      autoApply: true,
+      format: 'YYYY-MM-DD',
+      dropdowns: {
+        minYear: 2024,
+        maxYear: 2035,
+        months: true,
+        years: true
+      },
+      setup: (p) => {
+        p.on('selected', (start, end) => {
+          if (!start || !end) return;
+          customRange = { from: start.format('YYYY-MM-DD'), to: end.format('YYYY-MM-DD') };
+          month = 'custom';
+          document.querySelectorAll('.tab').forEach(t => {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
+          });
+          rangeBtn.classList.add('active');
+          rangeBtn.textContent = `Custom range: ${start.format('D MMM')} - ${end.format('D MMM')}`;
+          applyWidgetFiltering();
+          renderDynamicWidgets(lastAiPrompt || activeScenario.label);
+          updateKpis();
+          resizeAllChartsDeferred();
+        });
+      }
+    });
+
+    rangeBtn.addEventListener('click', () => {
+      picker.show();
+    });
+
+    runAiPrompt('Planned preventative maintenance readiness and compliance overview');
+
+    window.addEventListener('resize', () => {
+      resizeAllCharts();
+    });
+  </script>
+</body>
+</html>
