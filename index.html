@@ -736,6 +736,9 @@
                 <tr><td>Cleaning contract</td><td>Ending 2025-09-10</td><td><span class="pill p-amber">warning</span></td></tr>
                 <tr><td>Ground maintenance contract</td><td>Ending 2025-06-11</td><td><span class="pill p-red">critical</span></td></tr>
                 <tr><td>Annual fire risk assessment</td><td>Ending 2025-05-10</td><td><span class="pill p-red">critical</span></td></tr>
+                <tr><td>Water hygiene service</td><td>Ending 2025-08-15</td><td><span class="pill p-amber">warning</span></td></tr>
+                <tr><td>Lift preventive maintenance</td><td>Ending 2025-07-02</td><td><span class="pill p-amber">warning</span></td></tr>
+                <tr><td>Emergency lighting checks</td><td>Ending 2025-10-20</td><td><span class="pill p-blue">ok</span></td></tr>
               </tbody>
             </table>
           </div>
@@ -758,6 +761,9 @@
                 <tr><td>Fire Safety</td><td>544</td><td><span class="status-dot" style="background:#2f9c5d"></span></td><td><span class="status-dot" style="background:#ff9f1c"></span></td><td><span class="status-dot" style="background:#d94c61"></span></td></tr>
                 <tr><td>HVAC</td><td>361</td><td><span class="status-dot" style="background:#2f9c5d"></span></td><td><span class="status-dot" style="background:#ff9f1c"></span></td><td><span class="status-dot" style="background:#d94c61"></span></td></tr>
                 <tr><td>Electrical</td><td>282</td><td><span class="status-dot" style="background:#2f9c5d"></span></td><td><span class="status-dot" style="background:#ff9f1c"></span></td><td><span class="status-dot" style="background:#d94c61"></span></td></tr>
+                <tr><td>Water Hygiene</td><td>197</td><td><span class="status-dot" style="background:#2f9c5d"></span></td><td><span class="status-dot" style="background:#ff9f1c"></span></td><td><span class="status-dot" style="background:#d94c61"></span></td></tr>
+                <tr><td>Vertical Transport</td><td>143</td><td><span class="status-dot" style="background:#2f9c5d"></span></td><td><span class="status-dot" style="background:#ff9f1c"></span></td><td><span class="status-dot" style="background:#d94c61"></span></td></tr>
+                <tr><td>Building Fabric</td><td>121</td><td><span class="status-dot" style="background:#2f9c5d"></span></td><td><span class="status-dot" style="background:#ff9f1c"></span></td><td><span class="status-dot" style="background:#d94c61"></span></td></tr>
               </tbody>
             </table>
           </div>
@@ -860,11 +866,11 @@
         eventBadge: 'Critical',
         eventAudience: 'Audience: Property managers, compliance leads, FM operations',
         weights: { kpi: 1.22, service: 1.15, contracts: 1.12, assetsRisk: 1.2 },
-        comments: { unread: 6, read: 8, rows: [['Fire alarm certification missing evidence', 'Landlord', 'NEW'], ['Gas safety certificate expired', 'Contractor', '']] },
+        comments: { unread: 6, read: 8, rows: [['Fire alarm certification missing evidence', 'Landlord', 'NEW'], ['Gas safety certificate expired', 'Contractor', ''], ['Asbestos report upload incomplete', 'Consultant', 'NEW'], ['Emergency lighting test log missing signature', 'Contractor', ''], ['LOLER certificate awaiting approval', 'Landlord', '']] },
         issues: [['Reported', 8], ['Awaiting instructions', 3], ['Awaiting FM confirmation', 4], ['Job awarded, awaiting equipment date acceptance', 6], ['Remedial issued', 21]],
-        deadlines: [['Brookfield Mansion', 'Mar 2026-03-02', 'p-red', '8'], ['The Aspire', 'Mar 2026-03-05', 'p-amber', '4'], ['ECB', 'Mar 2026-03-06', 'p-blue', '2']],
-        risks: [['Brookfield Mansion', 11, 4, 7, 'p-red', '98%'], ['Ten Benefits Estate', 5, 8, 6, 'p-red', '92%'], ['Surrey Heights', 3, 4, 2, 'p-amber', '76%']],
-        services: [['Emergency lighting', 'Feb 2026-02-28', 'p-red', '4'], ['FRA', 'Mar 2026-03-04', 'p-amber', '3'], ['Water hygiene', 'Mar 2026-03-07', 'p-amber', '2']],
+        deadlines: [['Brookfield Mansion', 'Mar 2026-03-02', 'p-red', '8'], ['The Aspire', 'Mar 2026-03-05', 'p-amber', '4'], ['ECB', 'Mar 2026-03-06', 'p-blue', '2'], ['Elm Grove', 'Mar 2026-03-08', 'p-amber', '3'], ['Surrey Heights', 'Mar 2026-03-09', 'p-red', '5'], ['Ten Benefits Estate', 'Mar 2026-03-10', 'p-blue', '1']],
+        risks: [['Brookfield Mansion', 11, 4, 7, 'p-red', '98%'], ['Ten Benefits Estate', 5, 8, 6, 'p-red', '92%'], ['Surrey Heights', 3, 4, 2, 'p-amber', '76%'], ['Elm Grove', 2, 3, 2, 'p-amber', '71%'], ['The Aspire', 2, 2, 3, 'p-amber', '66%'], ['ECB Tower A', 1, 2, 2, 'p-green', '45%']],
+        services: [['Emergency lighting', 'Feb 2026-02-28', 'p-red', '4'], ['FRA', 'Mar 2026-03-04', 'p-amber', '3'], ['Water hygiene', 'Mar 2026-03-07', 'p-amber', '2'], ['Gas safety (CP12)', 'Mar 2026-03-08', 'p-red', '4'], ['Asbestos reassessment', 'Mar 2026-03-11', 'p-amber', '2'], ['LOLER', 'Mar 2026-03-12', 'p-blue', '1']],
         generated: [
           { title: 'AI Priority Actions', points: ['Escalate properties with 3+ overdue statutory items.', 'Assign named PM owner for each red-risk site.', 'Lock remediation due dates within 7 days.'] },
           { title: 'AI Compliance Narrative', points: ['Primary pressure is around fire safety and remedials.', 'Risk concentration is in high-density mixed-use buildings.', 'Weekly checkpoint cadence is recommended.'] }
@@ -879,11 +885,11 @@
         eventBadge: 'Action needed',
         eventAudience: 'Audience: Regional PMs and escalation desk',
         weights: { kpi: 1.3, service: 1.34, contracts: 1.06, assetsRisk: 1.1 },
-        comments: { unread: 9, read: 4, rows: [['Escalation requested for lift maintenance', 'Landlord', 'NEW'], ['Overdue due-date accepted without evidence', 'Contractor', 'NEW']] },
+        comments: { unread: 9, read: 4, rows: [['Escalation requested for lift maintenance', 'Landlord', 'NEW'], ['Overdue due-date accepted without evidence', 'Contractor', 'NEW'], ['FRA follow-up note pending PM sign-off', 'Landlord', ''], ['Emergency light test missed for Block C', 'Contractor', 'NEW'], ['Water hygiene update overdue from vendor', 'Contractor', '']] },
         issues: [['Reported', 11], ['Awaiting instructions', 5], ['Awaiting FM confirmation', 3], ['Job awarded, awaiting equipment date acceptance', 9], ['Remedial issued', 26]],
-        deadlines: [['Sales City (PIC)', 'Feb 2026-02-25', 'p-red', '9'], ['ECB', 'Feb 2026-02-27', 'p-amber', '5'], ['LOLB inspection', 'Mar 2026-03-01', 'p-amber', '4']],
-        risks: [['Ten Benefits Estate', 7, 9, 7, 'p-red', '94%'], ['Brookfield Mansion', 9, 5, 6, 'p-red', '91%'], ['Elm Grove', 3, 6, 4, 'p-amber', '74%']],
-        services: [['Lift maintenance', 'Feb 2026-02-24', 'p-red', '5'], ['FRA', 'Feb 2026-02-26', 'p-red', '3'], ['DSR', 'Mar 2026-03-02', 'p-amber', '2']],
+        deadlines: [['Sales City (PIC)', 'Feb 2026-02-25', 'p-red', '9'], ['ECB', 'Feb 2026-02-27', 'p-amber', '5'], ['LOLB inspection', 'Mar 2026-03-01', 'p-amber', '4'], ['Brookfield Mansion', 'Mar 2026-03-02', 'p-red', '7'], ['Elm Grove', 'Mar 2026-03-04', 'p-amber', '3'], ['Surrey Heights', 'Mar 2026-03-05', 'p-blue', '1']],
+        risks: [['Ten Benefits Estate', 7, 9, 7, 'p-red', '94%'], ['Brookfield Mansion', 9, 5, 6, 'p-red', '91%'], ['Elm Grove', 3, 6, 4, 'p-amber', '74%'], ['The Aspire', 2, 5, 4, 'p-amber', '69%'], ['ECB Tower A', 2, 4, 3, 'p-amber', '63%'], ['LOLB House', 1, 3, 2, 'p-green', '47%']],
+        services: [['Lift maintenance', 'Feb 2026-02-24', 'p-red', '5'], ['FRA', 'Feb 2026-02-26', 'p-red', '3'], ['DSR', 'Mar 2026-03-02', 'p-amber', '2'], ['Emergency lighting', 'Mar 2026-03-03', 'p-red', '4'], ['Gas safety (CP12)', 'Mar 2026-03-05', 'p-amber', '2'], ['LOLER', 'Mar 2026-03-06', 'p-blue', '1']],
         generated: [
           { title: 'AI Escalation Queue', points: ['Top PM backlog should be triaged first.', 'Bundle overdue tasks by contractor to accelerate closeout.', 'Enable daily stand-up for escalated items only.'] },
           { title: 'AI SLA Risk Watch', points: ['SLA breach risk is highest in lift and FRA workstreams.', 'Awaiting-instruction queue is now material to cycle time.', 'Track mean days overdue by PM weekly.'] }
@@ -898,11 +904,11 @@
         eventBadge: 'Financial focus',
         eventAudience: 'Audience: Asset managers, PM finance owners',
         weights: { kpi: 0.95, service: 1.08, contracts: 1.28, assetsRisk: 1.15 },
-        comments: { unread: 4, read: 10, rows: [['Budget variance commentary requested', 'Landlord', 'NEW'], ['Ground maintenance quote exceeded baseline', 'Contractor', '']] },
+        comments: { unread: 4, read: 10, rows: [['Budget variance commentary requested', 'Landlord', 'NEW'], ['Ground maintenance quote exceeded baseline', 'Contractor', ''], ['Vendor requested uplift due to inflation clause', 'Contractor', ''], ['Service charge cap review requested by PM', 'Landlord', 'NEW'], ['Waste disposal recurring fee anomaly flagged', 'Finance', '']] },
         issues: [['Reported', 4], ['Awaiting instructions', 3], ['Awaiting FM confirmation', 2], ['Job awarded, awaiting equipment date acceptance', 8], ['Remedial issued', 11]],
-        deadlines: [['ECB', 'Mar 2026-03-10', 'p-blue', '2'], ['Surrey Heights', 'Mar 2026-03-11', 'p-amber', '3'], ['Ten Benefits Estate', 'Mar 2026-03-09', 'p-red', '6']],
-        risks: [['Ten Benefits Estate', 6, 5, 7, 'p-red', '90%'], ['The Aspire', 3, 4, 5, 'p-amber', '68%'], ['Elm Grove', 1, 3, 3, 'p-green', '39%']],
-        services: [['Cleaning contract', 'Mar 2026-03-08', 'p-amber', '3'], ['Ground maintenance', 'Mar 2026-03-05', 'p-red', '4'], ['Waste disposal', 'Mar 2026-03-12', 'p-amber', '2']],
+        deadlines: [['ECB', 'Mar 2026-03-10', 'p-blue', '2'], ['Surrey Heights', 'Mar 2026-03-11', 'p-amber', '3'], ['Ten Benefits Estate', 'Mar 2026-03-09', 'p-red', '6'], ['The Aspire', 'Mar 2026-03-12', 'p-amber', '4'], ['Elm Grove', 'Mar 2026-03-13', 'p-blue', '2'], ['LOLB House', 'Mar 2026-03-15', 'p-amber', '3']],
+        risks: [['Ten Benefits Estate', 6, 5, 7, 'p-red', '90%'], ['The Aspire', 3, 4, 5, 'p-amber', '68%'], ['Elm Grove', 1, 3, 3, 'p-green', '39%'], ['Brookfield Mansion', 4, 3, 4, 'p-amber', '64%'], ['Sales City (PIC)', 2, 2, 3, 'p-amber', '59%'], ['ECB Tower A', 1, 1, 2, 'p-green', '34%']],
+        services: [['Cleaning contract', 'Mar 2026-03-08', 'p-amber', '3'], ['Ground maintenance', 'Mar 2026-03-05', 'p-red', '4'], ['Waste disposal', 'Mar 2026-03-12', 'p-amber', '2'], ['Fire equipment servicing', 'Mar 2026-03-13', 'p-amber', '3'], ['Lift maintenance', 'Mar 2026-03-15', 'p-red', '4'], ['HVAC servicing', 'Mar 2026-03-16', 'p-blue', '1']],
         generated: [
           { title: 'AI Cost Controls', points: ['Re-negotiate top two overrun contracts this month.', 'Shift non-critical tasks to next cycle where safe.', 'Prioritize repairs with highest resident impact per dollar.'] },
           { title: 'AI Budget Forecast', points: ['Projected overspend trend remains elevated next 6 weeks.', 'Ground and cleaning categories drive most variance.', 'Introduce pre-approval threshold for emergency spend.'] }
@@ -917,11 +923,11 @@
         eventBadge: 'Planning',
         eventAudience: 'Audience: PMs, planners, operations team',
         weights: { kpi: 0.9, service: 0.88, contracts: 1.05, assetsRisk: 0.95 },
-        comments: { unread: 3, read: 11, rows: [['Q2 readiness plan uploaded for review', 'Landlord', 'NEW'], ['Preventive checks sequencing confirmed', 'Contractor', '']] },
+        comments: { unread: 3, read: 11, rows: [['Q2 readiness plan uploaded for review', 'Landlord', 'NEW'], ['Preventive checks sequencing confirmed', 'Contractor', ''], ['Contractor slot allocation approved', 'Planner', ''], ['Resident notice templates finalized', 'PMO', ''], ['Spare parts list validated for Q2', 'Stores', '']] },
         issues: [['Reported', 3], ['Awaiting instructions', 1], ['Awaiting FM confirmation', 1], ['Job awarded, awaiting equipment date acceptance', 4], ['Remedial issued', 8]],
-        deadlines: [['ECB', 'Apr 2026-04-02', 'p-blue', '2'], ['Sales City (PIC)', 'Apr 2026-04-04', 'p-amber', '3'], ['LOLB inspection', 'Apr 2026-04-07', 'p-blue', '1']],
-        risks: [['Brookfield Mansion', 4, 2, 4, 'p-amber', '66%'], ['The Aspire', 2, 2, 3, 'p-amber', '58%'], ['Surrey Heights', 1, 1, 2, 'p-green', '31%']],
-        services: [['FRA', 'Apr 2026-04-06', 'p-blue', '1'], ['DSR', 'Apr 2026-04-08', 'p-blue', '1'], ['Water hygiene', 'Apr 2026-04-09', 'p-amber', '2']],
+        deadlines: [['ECB', 'Apr 2026-04-02', 'p-blue', '2'], ['Sales City (PIC)', 'Apr 2026-04-04', 'p-amber', '3'], ['LOLB inspection', 'Apr 2026-04-07', 'p-blue', '1'], ['Brookfield Mansion', 'Apr 2026-04-08', 'p-amber', '2'], ['Elm Grove', 'Apr 2026-04-10', 'p-blue', '1'], ['Surrey Heights', 'Apr 2026-04-11', 'p-blue', '1']],
+        risks: [['Brookfield Mansion', 4, 2, 4, 'p-amber', '66%'], ['The Aspire', 2, 2, 3, 'p-amber', '58%'], ['Surrey Heights', 1, 1, 2, 'p-green', '31%'], ['ECB Tower A', 1, 1, 2, 'p-green', '29%'], ['Sales City (PIC)', 1, 1, 1, 'p-green', '27%'], ['Ten Benefits Estate', 2, 1, 2, 'p-amber', '52%']],
+        services: [['FRA', 'Apr 2026-04-06', 'p-blue', '1'], ['DSR', 'Apr 2026-04-08', 'p-blue', '1'], ['Water hygiene', 'Apr 2026-04-09', 'p-amber', '2'], ['Emergency lighting', 'Apr 2026-04-11', 'p-blue', '1'], ['Gas safety (CP12)', 'Apr 2026-04-13', 'p-blue', '1'], ['LOLER', 'Apr 2026-04-15', 'p-amber', '2']],
         generated: [
           { title: 'AI Readiness Checklist', points: ['Confirm contractor slot coverage for all planned visits.', 'Validate document templates for statutory evidence.', 'Pre-notify residents for all high-impact maintenance windows.'] },
           { title: 'AI Capacity View', points: ['Current PM load supports planned cadence.', 'Readiness risk mainly tied to seasonal contractor demand.', 'Pull-forward low-risk tasks where capacity exists.'] }
@@ -1163,20 +1169,20 @@
           backgroundColor: '#f7f8fa',
           borderColor: '#dfe3e8',
           borderWidth: 1,
-          textStyle: { color: '#646d77', fontSize: 11 },
-          extraCssText: 'border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,.1);padding:8px 10px;',
+          textStyle: { color: '#646d77', fontSize: 12 },
+          extraCssText: 'border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.12);padding:6px 8px;',
           formatter: params => {
             const sorted = [...params].sort((a, b) => a.seriesIndex - b.seriesIndex);
             const rows = sorted.map((p, i) => {
               const pmText = p.data.pm || 'PM 1';
               const border = i < sorted.length - 1 ? 'border-bottom:1px solid #c8ced6;' : '';
-              return `<div style="display:grid;grid-template-columns:18px 32px 1fr;gap:8px;align-items:center;padding:8px 2px;${border}">
+              return `<div style="display:grid;grid-template-columns:14px 22px 1fr;gap:6px;align-items:center;padding:5px 2px;${border}">
                 <span style="width:12px;height:12px;border-radius:50%;background:${p.color};display:inline-block"></span>
-                <span style="font-size:20px;line-height:1;color:#5f6873">${p.value}</span>
-                <span style="font-size:20px;line-height:1.2;color:#5f6873">${pmText}</span>
+                <span style="font-size:13px;line-height:1;color:#5f6873;font-weight:700">${p.value}</span>
+                <span style="font-size:13px;line-height:1.25;color:#5f6873">${pmText}</span>
               </div>`;
             }).join('');
-            return `<div style="min-width:280px">${rows}</div>`;
+            return `<div style="min-width:220px;max-width:320px">${rows}</div>`;
           }
         },
         grid: { left: 42, right: 14, top: 14, bottom: 22 },
