@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PPM Dashboard</title>
+  <title>Fixflo Workspace</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css">
   <style>
@@ -176,6 +176,46 @@
       position: absolute;
       top: 8px;
       right: 8px;
+    }
+
+    body.auth-locked > :not(.email-gate) {
+      display: none !important;
+    }
+    .email-gate {
+      min-height: calc(100vh - 40px);
+      width: 100%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    body.auth-locked .email-gate {
+      display: flex;
+    }
+    .email-card {
+      width: 430px;
+      max-width: 100%;
+      background: #fff;
+      border: 1px solid #d7e1e8;
+      border-radius: 8px;
+      padding: 22px;
+      box-shadow: 0 12px 28px rgba(18, 43, 58, 0.15);
+    }
+    .email-title {
+      margin: 0 0 6px;
+      font-size: 24px;
+      font-weight: 700;
+      color: #0f3f57;
+    }
+    .email-sub {
+      margin: 0 0 14px;
+      font-size: 13px;
+      color: #607080;
+    }
+    .email-error {
+      margin-top: 8px;
+      color: #c0392b;
+      font-size: 12px;
+      min-height: 18px;
     }
 
 
@@ -512,33 +552,46 @@
     }
   </style>
 </head>
-<body>
+<body class="auth-locked">
+  <section class="email-gate" id="emailGate" aria-label="Email access gate">
+    <form class="email-card" id="emailGateForm">
+      <h2 class="email-title">Fixflo Workspace</h2>
+      <p class="email-sub">Enter your work email to view the demo.</p>
+      <div class="mb-2">
+        <label for="emailGateInput" class="form-label">Work email</label>
+        <input id="emailGateInput" class="form-control" type="email" autocomplete="email" required>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Access demo</button>
+      <div class="email-error" id="emailGateError"></div>
+    </form>
+  </section>
+
   <section class="ai-shell" id="aiShell">
     <div class="ai-head">
-      <h1 class="ai-title">PPM AI Workspace</h1>
-      <p class="ai-sub">Planned Preventative Maintenance only. Use AI to generate and refine this PPM dashboard view.</p>
+      <h1 class="ai-title">Fixflo Workspace</h1>
+      <p class="ai-sub">Use AI to generate a dashboard view from your prompt.</p>
     </div>
     <div class="ai-grid" id="promptGrid">
-      <button type="button" class="prompt-chip" data-prompt="Show planned preventative maintenance compliance risks for the next 30 days.">PPM compliance risk review (30 days)</button>
-      <button type="button" class="prompt-chip" data-prompt="Focus on overdue planned preventative maintenance events and PM escalations.">Overdue PPM events and PM escalations</button>
-      <button type="button" class="prompt-chip" data-prompt="Build a planned preventative maintenance budget pressure dashboard focused on service charge overspend.">PPM budget pressure and overspend</button>
-      <button type="button" class="prompt-chip" data-prompt="Give me a planned preventative maintenance readiness dashboard for next quarter.">PPM readiness (next quarter)</button>
+      <button type="button" class="prompt-chip" data-prompt="As a compliance manager, show statutory compliance risk and overdue actions for the next 30 days.">Compliance manager risk view</button>
+      <button type="button" class="prompt-chip" data-prompt="As a block director, show quotes awaiting decision, budget pressure and urgent building issues.">Block director decision view</button>
+      <button type="button" class="prompt-chip" data-prompt="As a tenant, show my requests, comments and important building notifications.">Tenant support view</button>
+      <button type="button" class="prompt-chip" data-prompt="As a property manager, show maintenance schedule, inspections and resident request workload.">Property manager operations view</button>
     </div>
     <div class="ai-controls">
-      <input id="aiPromptInput" class="ai-input" type="text" placeholder="Type your own PPM prompt, e.g. Prioritize overdue planned preventative maintenance checks." />
+      <input id="aiPromptInput" class="ai-input" type="text" placeholder="Type your prompt, e.g. I am a leaseholder and need quotes, documents and compliance status." />
       <button id="runAiPrompt" class="ai-run" type="button">Generate Dashboard</button>
     </div>
-    <div class="ai-meta" id="aiMeta">No prompt applied yet.</div>
+      <div class="ai-meta" id="aiMeta">No prompt applied yet.</div>
   </section>
 
   <main class="dashboard" id="dashboardRoot">
     <section class="top-hero">
       <button type="button" class="btn-close banner-close" id="dismissBanner" aria-label="Close event banner"></button>
-      <div class="hero-title" id="eventTitle">Upcoming event: Planned Water System Maintenance</div>
+      <div class="hero-title" id="eventTitle">Upcoming event: Portfolio Operations Review</div>
       <div class="hero-sub-row">
         <div>
-          <div class="hero-sub" id="eventDescription">Building: ECB Tower A | Wednesday, March 4, 2026 | 10:00 AM to 1:00 PM. Notify residents 24 hours before start.</div>
-          <div class="hero-event-meta"><span class="event-badge" id="eventBadge">Upcoming</span><span id="eventAudience">Audience: Property managers, residents, contractors</span></div>
+          <div class="hero-sub" id="eventDescription">Portfolio: Mixed-use blocks | Wednesday, March 4, 2026 | 10:00 AM to 11:30 AM. Review priorities by persona and confirm next actions.</div>
+          <div class="hero-event-meta"><span class="event-badge" id="eventBadge">Upcoming</span><span id="eventAudience">Audience: Directors, leaseholders, tenants, PMs and compliance teams</span><span class="event-badge" id="activePersonaBadge">Persona: Property manager</span></div>
         </div>
       </div>
     </section>
@@ -549,7 +602,7 @@
         <option value="all">All properties</option>
         <option value="city">Sales City (PIC)</option>
         <option value="ecb">ECB</option>
-        <option value="lol">LOL maintenance</option>
+        <option value="lol">LOL Estates</option>
       </select>
 
       <label for="userFilter" class="sr-only">Select dashboard user</label>
@@ -575,15 +628,15 @@
 
     <section class="kpi-row">
       <article class="kpi-card">
-        <div class="kpi-title">Upcoming events</div>
+        <div class="kpi-title" id="kpiTitle1">Upcoming events</div>
         <div class="kpi-value" id="kpiUpcoming">21</div>
       </article>
       <article class="kpi-card">
-        <div class="kpi-title">Events past due date</div>
+        <div class="kpi-title" id="kpiTitle2">Events past due date</div>
         <div class="kpi-value" id="kpiPast">25</div>
       </article>
       <article class="kpi-card">
-        <div class="kpi-title">Events approaching due date</div>
+        <div class="kpi-title" id="kpiTitle3">Events approaching due date</div>
         <div class="kpi-value" id="kpiApproaching">15</div>
       </article>
     </section>
@@ -722,7 +775,7 @@
 
     <section class="row-grid">
       <article class="widget h-340" id="widget-contracts">
-        <div class="widget-title">Planned maintenance contracts</div>
+        <div class="widget-title">Service agreements</div>
         <div class="widget-body">
           <div class="service-grid">
             <div>Active<strong style="color: var(--green);" id="contractsActive">117</strong></div>
@@ -743,7 +796,7 @@
             </table>
           </div>
         </div>
-        <div class="widget-footer"><a href="#" class="foot-link">View all service agreement (76)</a></div>
+        <div class="widget-footer"><a href="#" class="foot-link">View all service agreements (76)</a></div>
       </article>
 
       <article class="widget h-340" id="widget-assets">
@@ -794,6 +847,30 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
   <script>
+    function unlockWithEmail() {
+      document.body.classList.remove('auth-locked');
+    }
+
+    function isAllowedEmail(email) {
+      return /^[^\s@]+@aareon\.com$/i.test(email);
+    }
+
+    function initEmailGate() {
+      const form = document.getElementById('emailGateForm');
+      const input = document.getElementById('emailGateInput');
+      const error = document.getElementById('emailGateError');
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        const email = input.value.trim();
+        if (!isAllowedEmail(email)) {
+          error.textContent = 'Incorrect email, please try again.';
+          return;
+        }
+        error.textContent = '';
+        unlockWithEmail();
+      });
+    }
+
     const models = {
       all: {
         current: { kpi: [21, 25, 15], service: [16, 2, 3], contracts: [117, 35, 13], assets: [1187, 35, 3] },
@@ -881,7 +958,7 @@
         label: 'Overdue events and PM escalations',
         focusWidgets: ['widget-issues', 'widget-deadlines', 'widget-risk', 'widget-service', 'widget-inspection', 'widget-comments'],
         eventTitle: 'Upcoming event: PM Escalation Board',
-        eventDescription: 'Portfolio: Multi-site | Thursday, February 26, 2026 | 2:00 PM to 3:30 PM. Review all overdue PPM events by property manager.',
+        eventDescription: 'Portfolio: Multi-site | Thursday, February 26, 2026 | 2:00 PM to 3:30 PM. Review all overdue operations events by property manager.',
         eventBadge: 'Action needed',
         eventAudience: 'Audience: Regional PMs and escalation desk',
         weights: { kpi: 1.3, service: 1.34, contracts: 1.06, assetsRisk: 1.1 },
@@ -940,7 +1017,9 @@
     let selectedUser = 'me';
     let customRange = { from: null, to: null };
     let activeScenario = aiScenarios.readiness;
+    let activePersona = 'property_manager';
     let lastAiPrompt = '';
+    let activeDynamicWidgetIds = [];
     let dynamicCharts = [];
 
     const allWidgetIds = [
@@ -954,6 +1033,202 @@
       alex: 1.08,
       jamie: 0.93,
       sam: 1.15
+    };
+
+    const defaultPersonaByUser = {
+      me: 'property_manager',
+      alex: 'director',
+      jamie: 'compliance_manager',
+      sam: 'block_director'
+    };
+
+    const personaProfiles = {
+      senior_property_manager: {
+        label: 'Senior property manager',
+        baseWidgets: ['widget-comments', 'widget-issues', 'widget-deadlines', 'widget-risk', 'widget-service', 'widget-inspection', 'widget-trend', 'widget-contracts'],
+        dynamicWidgets: ['team-performance', 'team-allocation', 'maintenance-schedule', 'building-issues']
+      },
+      compliance_manager: {
+        label: 'Compliance manager',
+        baseWidgets: ['widget-compliance', 'widget-deadlines', 'widget-risk', 'widget-inspection', 'widget-trend', 'widget-service', 'widget-assets', 'widget-issues'],
+        dynamicWidgets: ['document-centre', 'service-agreements', 'overall-compliance-rate', 'building-notifications']
+      },
+      property_manager: {
+        label: 'Property manager',
+        baseWidgets: ['widget-comments', 'widget-issues', 'widget-deadlines', 'widget-risk', 'widget-service', 'widget-inspection', 'widget-contracts'],
+        dynamicWidgets: ['maintenance-schedule', 'resident-requests', 'building-issues', 'document-centre']
+      },
+      block_director: {
+        label: 'Block director',
+        baseWidgets: ['widget-budgets', 'widget-deadlines', 'widget-risk', 'widget-assets', 'widget-comments', 'widget-issues'],
+        dynamicWidgets: ['quote-tracker', 'building-issues', 'building-notifications', 'document-centre']
+      },
+      director: {
+        label: 'Director',
+        baseWidgets: ['widget-trend', 'widget-assets', 'widget-budgets', 'widget-risk', 'widget-contracts', 'widget-deadlines', 'widget-issues'],
+        dynamicWidgets: ['quote-tracker', 'overall-compliance-rate', 'document-centre', 'building-notifications']
+      },
+      leaseholder: {
+        label: 'Leaseholder',
+        baseWidgets: ['widget-comments', 'widget-budgets', 'widget-deadlines', 'widget-service', 'widget-assets'],
+        dynamicWidgets: ['quote-tracker', 'document-centre', 'service-agreements', 'maintenance-schedule']
+      },
+      landlord: {
+        label: 'Landlord',
+        baseWidgets: ['widget-comments', 'widget-issues', 'widget-budgets', 'widget-deadlines', 'widget-risk', 'widget-assets'],
+        dynamicWidgets: ['quote-tracker', 'document-centre', 'service-agreements', 'building-notifications']
+      },
+      tenant: {
+        label: 'Tenant',
+        baseWidgets: ['widget-comments', 'widget-deadlines'],
+        dynamicWidgets: ['resident-requests', 'building-notifications', 'maintenance-schedule', 'new-request-actions']
+      }
+    };
+
+    const personaKpiProfiles = {
+      senior_property_manager: { titles: ['Team open workload', 'Team overdue actions', 'This week team visits'] },
+      compliance_manager: { titles: ['Upcoming compliance actions', 'Overdue statutory actions', 'Critical risk items'] },
+      property_manager: { titles: ['Open work orders', 'Overdue tasks', 'Visits due this week'] },
+      block_director: { titles: ['Items awaiting decision', 'High-impact issues', 'Budget risk items'] },
+      director: { titles: ['Portfolio risk items', 'Decisions required', 'Sites off track'] },
+      leaseholder: { titles: ['Building updates', 'Open decisions', 'Upcoming impactful works'] },
+      landlord: { titles: ['Properties needing action', 'Quotes awaiting approval', 'Urgent issues'] },
+      tenant: { titles: ['My open requests', 'Awaiting update', 'Upcoming works affecting me'] }
+    };
+
+    const dynamicWidgetCatalog = {
+      'maintenance-schedule': {
+        title: 'Maintenance Schedule',
+        cta: 'View all schedules (8)',
+        kpis: [{ value: '1', label: 'Urgent', color: 'var(--red)' }, { value: '2', label: 'Confirmed', color: 'var(--green)' }, { value: '4', label: 'This week', color: 'var(--blue)' }],
+        headers: ['Task', 'Date', ''],
+        rows: [
+          ['Elevator monthly inspection<div class="text-muted small">Elevator Solutions Ltd · Main Building</div>', '2026-03-28', '<span class="pill p-green">Confirmed</span>'],
+          ['Garden maintenance<div class="text-muted small">Green Spaces Co · External Grounds</div>', '2026-03-29', '<span class="pill p-amber">Pending</span>'],
+          ['Fire door checks<div class="text-muted small">SafeDoor Services · Block B</div>', '2026-03-30', '<span class="pill p-blue">Scheduled</span>']
+        ],
+        chart: { type: 'line', labels: ['W1', 'W2', 'W3', 'W4'], values: [5, 8, 6, 9], color: '#169fdd' }
+      },
+      'quote-tracker': {
+        title: 'Quote Tracker',
+        cta: 'View all quotes (12)',
+        kpis: [{ value: '3', label: 'Urgent', color: 'var(--red)' }, { value: '2', label: 'Need decision', color: 'var(--red)' }, { value: '1', label: 'In progress', color: 'var(--blue)' }],
+        headers: ['Quote', 'Amount', ''],
+        rows: [
+          ['Roof Repair - Block A<div class="text-muted small">Premium Roofing Ltd</div>', '£15,750', '<span class="pill p-red">Vote needed</span>'],
+          ['Car Park Resurfacing<div class="text-muted small">SurfacePro</div>', '£22,500', '<span class="pill p-red">Vote needed</span>'],
+          ['Balcony railing replacement<div class="text-muted small">Urban Metalworks</div>', '£9,600', '<span class="pill p-amber">Awaiting review</span>']
+        ],
+        chart: { type: 'bar', labels: ['Urgent', 'Need decision', 'In progress'], values: [3, 2, 1], color: '#d94c61' }
+      },
+      'document-centre': {
+        title: 'Document centre',
+        cta: 'View all documents (34)',
+        kpis: [{ value: '3', label: 'Need review', color: 'var(--red)' }, { value: '2', label: 'New this week', color: 'var(--blue)' }, { value: '34', label: 'Total docs', color: '#1f252b' }],
+        headers: ['Document', 'Date', ''],
+        rows: [
+          ['Q3 Financial Report<div class="text-muted small">Financial · Finance Team · 2.4 MB</div>', '2026-03-15', '<span class="pill p-blue">New</span>'],
+          ['Insurance Policy Renewal<div class="text-muted small">Legal · Property Manager · 1.8 MB</div>', '2026-03-15', '<span class="pill p-red">Review needed</span>'],
+          ['Fire strategy update<div class="text-muted small">Compliance · H&S Team · 3.1 MB</div>', '2026-03-13', '<span class="pill p-amber">Pending sign-off</span>']
+        ],
+        chart: { type: 'line', labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], values: [4, 2, 5, 3, 6], color: '#169fdd' }
+      },
+      'resident-requests': {
+        title: 'Resident Requests',
+        cta: 'View all requests (14)',
+        kpis: [{ value: '1', label: 'Urgent', color: 'var(--red)' }, { value: '2', label: 'Pending', color: '#1f252b' }, { value: '1', label: 'In progress', color: 'var(--blue)' }],
+        headers: ['Request', 'Date', ''],
+        rows: [
+          ['Noisy neighbour complaint<div class="text-muted small">Apt 4B · Sarah Johnson</div>', '2026-03-24', '<span class="pill p-blue">In progress</span>'],
+          ['Parking space dispute<div class="text-muted small">Apt 2A · Mike Wilson</div>', '2026-03-14', '<span class="pill p-amber">Pending</span>'],
+          ['Heating issue<div class="text-muted small">Apt 6C · Emma Ray</div>', '2026-03-13', '<span class="pill p-red">Urgent</span>']
+        ],
+        chart: { type: 'bar', labels: ['Urgent', 'Pending', 'In progress'], values: [1, 2, 1], color: '#1f9dd6' }
+      },
+      'building-notifications': {
+        title: 'Building notifications',
+        cta: 'View all notifications (9)',
+        kpis: [{ value: '2', label: 'High importance', color: 'var(--red)' }, { value: '1', label: 'Today', color: 'var(--blue)' }, { value: '9', label: 'Total', color: '#1f252b' }],
+        headers: ['Notification', 'When', ''],
+        rows: [
+          ['Security system update<div class="text-muted small">New entry codes will be active from tonight</div>', '3 hours ago', '<span class="pill p-red">High</span>'],
+          ['Compliance deadline<div class="text-muted small">Fire safety certificate renewal due in 3 days</div>', '1 day ago', '<span class="pill p-red">High</span>'],
+          ['Water shutdown notice<div class="text-muted small">Planned works Saturday 08:00-11:00</div>', '2 days ago', '<span class="pill p-blue">Info</span>']
+        ],
+        chart: { type: 'bar', labels: ['High', 'Info', 'Updates'], values: [2, 4, 3], color: '#ff9f1c' }
+      },
+      'service-agreements': {
+        title: 'Service agreements',
+        cta: 'View all service agreements (2186)',
+        kpis: [{ value: '1187', label: 'Active', color: 'var(--green)' }, { value: '35', label: 'Expiring soon', color: 'var(--amber)' }, { value: '13', label: 'Published', color: 'var(--blue)' }],
+        headers: ['Agreement', 'Date', ''],
+        rows: [
+          ['021-Mews-Fire Assets<div class="text-muted small">Dawn Fire & Security Ltd</div>', 'Ending: 2026-03-14', '<span class="pill p-amber">Expiring soon</span>'],
+          ['144-17 Ford Ave-Fire Assets<div class="text-muted small">Millar Fire & Safety</div>', 'Ending: 2026-03-14', '<span class="pill p-amber">Expiring soon</span>'],
+          ['147-Grove Road-Fire Assets<div class="text-muted small">Fire Guard Ltd</div>', 'Ending: 2026-03-20', '<span class="pill p-blue">Published</span>']
+        ],
+        chart: { type: 'line', labels: ['Jan', 'Feb', 'Mar', 'Apr'], values: [1200, 1193, 1187, 1182], color: '#2f9c5d' }
+      },
+      'building-issues': {
+        title: 'Building Issues',
+        cta: 'View all issues (24)',
+        kpis: [{ value: '3', label: 'Awaiting approval', color: 'var(--amber)' }, { value: '2', label: 'Total active', color: 'var(--blue)' }, { value: '1', label: 'Urgent', color: 'var(--red)' }],
+        headers: ['Issue', 'Date', ''],
+        rows: [
+          ['Water leak in basement<div class="text-muted small">Plumbing · Resident 4A</div>', '2026-03-14', '<span class="pill p-amber">Awaiting approval</span>'],
+          ['Roof Repair - Block A<div class="text-muted small">Structural · Building Surveyor</div>', '2026-03-14', '<span class="pill p-red">Urgent</span>'],
+          ['Lift sensor error<div class="text-muted small">Mechanical · Lift vendor</div>', '2026-03-12', '<span class="pill p-blue">In progress</span>']
+        ],
+        chart: { type: 'bar', labels: ['Awaiting', 'Active', 'Urgent'], values: [3, 2, 1], color: '#d94c61' }
+      },
+      'overall-compliance-rate': {
+        title: 'Overall Compliance Rate',
+        cta: 'View full compliance summary',
+        kpis: [{ value: '82%', label: 'Current', color: 'var(--green)' }, { value: '-3%', label: 'MoM', color: 'var(--red)' }, { value: '1187', label: 'Assessed', color: 'var(--blue)' }],
+        headers: ['Workstream', 'Rate', ''],
+        rows: [
+          ['Fire safety controls', '91%', '<span class="pill p-green">Healthy</span>'],
+          ['Electrical inspections', '78%', '<span class="pill p-amber">Watch</span>'],
+          ['Water hygiene', '69%', '<span class="pill p-red">Action needed</span>']
+        ],
+        chart: { type: 'line', labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], values: [86, 84, 83, 85, 82, 82], color: '#2f9c5d' }
+      },
+      'team-performance': {
+        title: 'Team Performance',
+        cta: 'View team performance details',
+        kpis: [{ value: '89%', label: 'SLA hit rate', color: 'var(--green)' }, { value: '24h', label: 'Avg first response', color: 'var(--blue)' }, { value: '7', label: 'Escalations', color: 'var(--red)' }],
+        headers: ['PM', 'Completion', ''],
+        rows: [
+          ['PM Alex Morgan<div class="text-muted small">North cluster</div>', '93%', '<span class="pill p-green">Top</span>'],
+          ['PM Sam Lee<div class="text-muted small">Central cluster</div>', '88%', '<span class="pill p-blue">On target</span>'],
+          ['PM Jamie Patel<div class="text-muted small">South cluster</div>', '81%', '<span class="pill p-amber">Watch</span>']
+        ],
+        chart: { type: 'line', labels: ['W1', 'W2', 'W3', 'W4'], values: [84, 87, 89, 89], color: '#2f9c5d' }
+      },
+      'team-allocation': {
+        title: 'Team Allocation',
+        cta: 'View allocation board',
+        kpis: [{ value: '64%', label: 'Planned capacity', color: 'var(--blue)' }, { value: '22%', label: 'High-risk load', color: 'var(--amber)' }, { value: '14%', label: 'Available capacity', color: 'var(--green)' }],
+        headers: ['PM', 'Assigned sites', ''],
+        rows: [
+          ['PM Alex Morgan<div class="text-muted small">Fire, lifts, statutory checks</div>', '18', '<span class="pill p-amber">Near limit</span>'],
+          ['PM Sam Lee<div class="text-muted small">Resident issues, repairs</div>', '14', '<span class="pill p-blue">Balanced</span>'],
+          ['PM Jamie Patel<div class="text-muted small">Compliance backlog reduction</div>', '11', '<span class="pill p-green">Capacity</span>']
+        ],
+        chart: { type: 'bar', labels: ['Alex', 'Sam', 'Jamie'], values: [18, 14, 11], color: '#169fdd' }
+      },
+      'new-request-actions': {
+        title: 'New Request Actions',
+        cta: 'Create new request',
+        kpis: [{ value: '2', label: 'Open', color: 'var(--blue)' }, { value: '1', label: 'Awaiting visit', color: 'var(--amber)' }, { value: '0', label: 'Urgent', color: 'var(--red)' }],
+        headers: ['Action', 'Status', ''],
+        rows: [
+          ['Report a new issue<div class="text-muted small">Create a repair request with photos</div>', 'Ready', '<span class="pill p-blue">Start</span>'],
+          ['Track my latest request<div class="text-muted small">View updates and contractor ETA</div>', 'In progress', '<span class="pill p-amber">View</span>'],
+          ['Manage access notes<div class="text-muted small">Update access instructions for visits</div>', 'Available', '<span class="pill p-green">Update</span>']
+        ],
+        chart: { type: 'bar', labels: ['Open', 'Awaiting visit', 'Urgent'], values: [2, 1, 0], color: '#169fdd' }
+      }
     };
 
     const categoryChart = echarts.init(document.getElementById('categoryChart'));
@@ -993,36 +1268,80 @@
       renderBudgetChart();
     }
 
-    function detectScenario(prompt) {
-      const q = `planned preventative maintenance ${prompt.toLowerCase()}`;
-      if (q.includes('budget') || q.includes('overspend') || q.includes('cost') || q.includes('service charge')) return aiScenarios.budget;
-      if (q.includes('overdue') || q.includes('escalation') || q.includes('urgent')) return aiScenarios.overdue;
-      if (q.includes('ready') || q.includes('preventive') || q.includes('quarter') || q.includes('plan')) return aiScenarios.readiness;
-      return aiScenarios.compliance;
+    function detectScenario(prompt, persona = activePersona) {
+      const q = prompt.toLowerCase();
+      if (q.includes('budget') || q.includes('overspend') || q.includes('cost') || q.includes('service charge') || q.includes('quote')) return aiScenarios.budget;
+      if (q.includes('overdue') || q.includes('escalation') || q.includes('urgent') || q.includes('issue')) return aiScenarios.overdue;
+      if (q.includes('compliance') || q.includes('statutory') || q.includes('certificate') || q.includes('audit')) return aiScenarios.compliance;
+      if (persona === 'tenant' || persona === 'leaseholder') return aiScenarios.readiness;
+      if (persona === 'compliance_manager') return aiScenarios.compliance;
+      if (persona === 'director' || persona === 'block_director' || persona === 'landlord') return aiScenarios.budget;
+      return aiScenarios.readiness;
+    }
+
+    function detectPersona(prompt) {
+      const q = prompt.toLowerCase().trim();
+
+      const hasTenant = /\b(tenant|tenent|tenet|occupier|resident)\b/.test(q) ||
+        /\b(my requests?|ongoing requests?|create request|new request|report issue|book repair|track my repair|my flat|my apartment)\b/.test(q);
+      if (hasTenant) return 'tenant';
+
+      if (/\b(senior property manager|head of property|regional property manager)\b/.test(q)) return 'senior_property_manager';
+      if (/\b(compliance manager|compliance lead|compliance team)\b/.test(q)) return 'compliance_manager';
+      if (/\b(block director)\b/.test(q)) return 'block_director';
+      if (/\b(director|portfolio head)\b/.test(q)) return 'director';
+      if (/\b(landlord)\b/.test(q)) return 'landlord';
+      if (/\b(leaseholder|lease holder)\b/.test(q)) return 'leaseholder';
+
+      const hasPm = /\b(property manager|facilities manager|estate manager|building manager)\b/.test(q) ||
+        /\bpm\b/.test(q) ||
+        /\b(work orders?|site inspections?|contractor|maintenance schedule)\b/.test(q);
+      if (hasPm) return 'property_manager';
+
+      return defaultPersonaByUser[selectedUser] || 'property_manager';
+    }
+
+    function applyPersonaChrome() {
+      const label = (personaProfiles[activePersona] || personaProfiles.property_manager).label;
+      const badge = document.getElementById('activePersonaBadge');
+      if (badge) badge.textContent = `Persona: ${label}`;
     }
 
     function getSelectionDrivenWidgets() {
-      const ids = new Set(activeScenario.focusWidgets || allWidgetIds);
-      if (property === 'ecb') {
+      const profile = personaProfiles[activePersona] || personaProfiles.property_manager;
+      const ids = new Set(profile.baseWidgets);
+      (activeScenario.focusWidgets || []).forEach(id => {
+        if (profile.baseWidgets.includes(id) || id === 'widget-deadlines' || id === 'widget-comments') ids.add(id);
+      });
+      if (property === 'ecb' && activePersona !== 'tenant') {
         ids.add('widget-service');
         ids.add('widget-deadlines');
       }
-      if (property === 'city') {
+      if (property === 'city' && activePersona !== 'tenant') {
         ids.add('widget-risk');
         ids.add('widget-comments');
       }
-      if (selectedUser === 'alex') {
+      if (selectedUser === 'alex' && activePersona !== 'tenant') {
         ids.add('widget-trend');
       }
-      if (selectedUser === 'sam') {
+      if (selectedUser === 'sam' && activePersona !== 'tenant') {
         ids.add('widget-issues');
         ids.add('widget-inspection');
       }
-      if (month === 'custom' || month === 'next6') {
+      if ((month === 'custom' || month === 'next6') && activePersona !== 'tenant') {
         ids.add('widget-deadlines');
-        ids.add('widget-contracts');
+        if (activePersona !== 'leaseholder') ids.add('widget-contracts');
       }
       return ids;
+    }
+
+    function getPromptWidgetBoosts(prompt) {
+      const q = prompt.toLowerCase();
+      const boosts = [];
+      if (q.includes('team') && (q.includes('performance') || q.includes('kpi'))) boosts.push('team-performance');
+      if (q.includes('team') && (q.includes('allocation') || q.includes('capacity') || q.includes('workload'))) boosts.push('team-allocation');
+      if (activePersona === 'senior_property_manager') boosts.push('team-performance', 'team-allocation');
+      return [...new Set(boosts)];
     }
 
     function applyWidgetFiltering() {
@@ -1063,70 +1382,73 @@
       dynamicCharts = [];
     }
 
+    function createDynamicChartOption(chart) {
+      const base = {
+        animationDuration: 300,
+        tooltip: { trigger: 'axis' },
+        grid: { left: 30, right: 12, top: 12, bottom: 20 },
+        xAxis: { type: 'category', data: chart.labels, axisLabel: { fontSize: 10, color: '#6f6f6f' }, axisLine: { lineStyle: { color: '#d9d9d9' } } },
+        yAxis: { type: 'value', axisLabel: { fontSize: 10, color: '#6f6f6f' }, splitLine: { lineStyle: { color: '#eceff1' } } }
+      };
+      if (chart.type === 'bar') {
+        return {
+          ...base,
+          series: [{ type: 'bar', barWidth: 16, itemStyle: { color: chart.color, borderRadius: [6, 6, 0, 0] }, data: chart.values }]
+        };
+      }
+      return {
+        ...base,
+        series: [{ type: 'line', smooth: true, symbolSize: 6, lineStyle: { width: 2, color: chart.color }, itemStyle: { color: chart.color }, data: chart.values }]
+      };
+    }
+
+    function buildDynamicWidgetMarkup(def, idx) {
+      const chartId = `dynamicChart${idx}`;
+      const kpiHtml = (def.kpis || []).map(item => `<div>${item.label}<strong style="color:${item.color};">${item.value}</strong></div>`).join('');
+      const rowHtml = (def.rows || []).map(row => `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2] || ''}</td></tr>`).join('');
+      const tableHtml = def.headers ? `
+        <div class="table-scroll">
+          <table class="table table-sm align-middle">
+            <thead><tr>${def.headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+            <tbody>${rowHtml}</tbody>
+          </table>
+        </div>
+      ` : '';
+      return `
+        <article class="widget h-320">
+          <div class="widget-title">${def.title}</div>
+          <div class="widget-body">
+            ${def.kpis ? `<div class="service-grid">${kpiHtml}</div>` : ''}
+            ${def.chart ? `<div class="chart-box chart-mini"><div id="${chartId}" class="echart echart-sm"></div></div>` : ''}
+            ${tableHtml}
+          </div>
+          <div class="widget-footer"><a href="#" class="foot-link">${def.cta}</a></div>
+        </article>
+      `;
+    }
+
     function renderDynamicWidgets(prompt) {
       const row = document.getElementById('dynamicWidgetsRow');
-      const scope = property === 'all' ? 'Portfolio' : document.getElementById('propertyFilter').selectedOptions[0].textContent;
-      const owner = document.getElementById('userFilter').selectedOptions[0].textContent;
-      const data = getDataForPeriod();
       disposeDynamicCharts();
-      const blocks = (activeScenario.generated || []).map(item => ({
-        title: item.title,
-        points: item.points
-      }));
-      blocks.push({
-        title: 'AI Context Applied',
-        points: [
-          `Prompt focus: ${prompt || activeScenario.label}.`,
-          `Scope: ${scope}.`,
-          `Owner view: ${owner}.`
-        ]
-      });
-
-      row.innerHTML = blocks.slice(0, 2).map((block, idx) => `
-        <article class="widget h-320">
-          <div class="widget-title">${block.title}</div>
-          <div class="widget-body">
-            <div class="generated-meta">Generated from current prompt and selection filters.</div>
-            <div class="chart-box chart-mini"><div id="dynamicChart${idx}" class="echart echart-sm"></div></div>
-            <ul class="generated-list">
-              ${block.points.map(p => `<li>${p}</li>`).join('')}
-            </ul>
-          </div>
-          <div class="widget-footer"><a href="#" class="foot-link">View AI details</a></div>
-        </article>
-      `).join('');
-
+      const defs = activeDynamicWidgetIds.map(id => dynamicWidgetCatalog[id]).filter(Boolean);
+      if (!defs.length) {
+        row.innerHTML = '';
+        row.classList.add('hidden');
+        compactWidgetRows();
+        return;
+      }
+      row.innerHTML = defs.map((def, idx) => buildDynamicWidgetMarkup(def, idx)).join('');
       row.classList.remove('hidden');
       compactWidgetRows();
 
-      const chart0 = echarts.init(document.getElementById('dynamicChart0'));
-      chart0.setOption({
-        animationDuration: 300,
-        tooltip: { trigger: 'axis' },
-        grid: { left: 28, right: 10, top: 12, bottom: 18 },
-        xAxis: { type: 'category', data: ['Upcoming', 'Past due', 'Due soon'], axisLabel: { fontSize: 10 } },
-        yAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#eceff1' } } },
-        series: [{ type: 'bar', barWidth: 20, itemStyle: { color: '#169fdd', borderRadius: [6, 6, 0, 0] }, data: data.kpi }]
+      defs.forEach((def, idx) => {
+        if (!def.chart) return;
+        const host = document.getElementById(`dynamicChart${idx}`);
+        if (!host) return;
+        const chart = echarts.init(host);
+        chart.setOption(createDynamicChartOption(def.chart));
+        dynamicCharts.push(chart);
       });
-
-      const chart1 = echarts.init(document.getElementById('dynamicChart1'));
-      chart1.setOption({
-        animationDuration: 300,
-        tooltip: { trigger: 'axis' },
-        grid: { left: 28, right: 10, top: 12, bottom: 18 },
-        xAxis: { type: 'category', data: ['Compliant', 'Due soon', 'Non-compliant'], axisLabel: { fontSize: 10 } },
-        yAxis: { type: 'value', axisLabel: { fontSize: 10 }, splitLine: { lineStyle: { color: '#eceff1' } } },
-        series: [{
-          type: 'line',
-          smooth: true,
-          symbolSize: 6,
-          lineStyle: { width: 2, color: '#2f9c5d' },
-          itemStyle: { color: '#2f9c5d' },
-          data: data.service
-        }]
-      });
-
-      dynamicCharts.push(chart0, chart1);
     }
 
     function renderCategoryChart() {
@@ -1289,14 +1611,47 @@
       };
     }
 
+    function getPersonaKpiValues(data, factor) {
+      if (activePersona === 'tenant') {
+        const open = Math.max(1, Math.round((activeScenario.comments.unread || 2) * factor * 0.35));
+        const awaiting = Math.max(1, Math.round((activeScenario.comments.read || 3) * factor * 0.2));
+        const impacts = Math.max(1, Math.round((data.kpi[2] || 4) * factor * 0.14));
+        return [open, awaiting, impacts];
+      }
+      if (activePersona === 'leaseholder') {
+        return [
+          Math.max(1, Math.round(data.kpi[0] * factor * 0.45)),
+          Math.max(1, Math.round(data.kpi[1] * factor * 0.28)),
+          Math.max(1, Math.round(data.kpi[2] * factor * 0.22))
+        ];
+      }
+      if (activePersona === 'director' || activePersona === 'block_director' || activePersona === 'landlord') {
+        return [
+          Math.max(1, Math.round(data.kpi[1] * factor * 0.55)),
+          Math.max(1, Math.round(data.kpi[2] * factor * 0.45)),
+          Math.max(1, Math.round(data.service[2] * factor * 1.2))
+        ];
+      }
+      return scaleValues(data.kpi, factor);
+    }
+
+    function applyPersonaKpiTitles() {
+      const profile = personaKpiProfiles[activePersona] || personaKpiProfiles.property_manager;
+      const [t1, t2, t3] = profile.titles;
+      document.getElementById('kpiTitle1').textContent = t1;
+      document.getElementById('kpiTitle2').textContent = t2;
+      document.getElementById('kpiTitle3').textContent = t3;
+    }
+
     function updateKpis() {
       const data = getDataForPeriod();
       const factor = userScale[selectedUser] || 1;
-      const [u, p, a] = scaleValues(data.kpi, factor);
+      const [u, p, a] = getPersonaKpiValues(data, factor);
       const [svcC, svcD, svcN] = scaleValues(data.service, factor);
       const [conA, conE, conI] = scaleValues(data.contracts, factor);
       const [astT, astR, astN] = scaleValues(data.assets, factor);
 
+      applyPersonaKpiTitles();
       document.getElementById('kpiUpcoming').textContent = u;
       document.getElementById('kpiPast').textContent = p;
       document.getElementById('kpiApproaching').textContent = a;
@@ -1310,19 +1665,26 @@
       document.getElementById('assetsRisk').textContent = astR;
       document.getElementById('assetsNon').textContent = astN;
       document.getElementById('updatedText').textContent = `Last update at ${new Date().toLocaleString()}`;
+      applyPersonaChrome();
     }
 
     function runAiPrompt(prompt) {
       const trimmed = prompt.trim();
       if (!trimmed) return;
       lastAiPrompt = trimmed;
-      activeScenario = detectScenario(trimmed);
+      activePersona = detectPersona(trimmed);
+      const baseDynamic = (personaProfiles[activePersona] || personaProfiles.property_manager).dynamicWidgets;
+      const boosted = [...getPromptWidgetBoosts(trimmed), ...baseDynamic];
+      activeDynamicWidgetIds = [...new Set(boosted)].slice(0, 4);
+      activeScenario = detectScenario(trimmed, activePersona);
+      if (activePersona === 'tenant') activeScenario = aiScenarios.readiness;
+      applyPersonaChrome();
       applyScenarioVisuals(activeScenario);
       applyWidgetFiltering();
       renderDynamicWidgets(trimmed);
       updateKpis();
       resizeAllChartsDeferred();
-      document.getElementById('aiMeta').textContent = `Generated using prompt: "${trimmed}" (${activeScenario.label})`;
+      document.getElementById('aiMeta').textContent = `Generated using prompt: "${trimmed}" | Persona: ${(personaProfiles[activePersona] || personaProfiles.property_manager).label} | View: ${activeScenario.label}`;
     }
 
     document.querySelectorAll('.tab').forEach(btn => {
@@ -1352,6 +1714,11 @@
 
     document.getElementById('userFilter').addEventListener('change', e => {
       selectedUser = e.target.value;
+      activePersona = detectPersona(lastAiPrompt || '');
+      const baseDynamic = (personaProfiles[activePersona] || personaProfiles.property_manager).dynamicWidgets;
+      const boosted = [...getPromptWidgetBoosts(lastAiPrompt || ''), ...baseDynamic];
+      activeDynamicWidgetIds = [...new Set(boosted)].slice(0, 4);
+      applyPersonaChrome();
       applyWidgetFiltering();
       renderDynamicWidgets(lastAiPrompt || activeScenario.label);
       updateKpis();
@@ -1434,7 +1801,8 @@
       picker.show();
     });
 
-    runAiPrompt('Planned preventative maintenance readiness and compliance overview');
+    initEmailGate();
+    runAiPrompt('As a property manager show maintenance schedule, inspections, issues and resident requests');
 
     window.addEventListener('resize', () => {
       resizeAllCharts();
