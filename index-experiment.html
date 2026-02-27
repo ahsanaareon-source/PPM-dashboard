@@ -1,0 +1,3660 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fixflo Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css">
+  <style>
+    :root {
+      --bg: #f4f5f6;
+      --card: #ffffff;
+      --line: #e4e6e8;
+      --text: #4a4f55;
+      --blue: #169fdd;
+      --green: #2f9c5d;
+      --amber: #ff9f1c;
+      --red: #d94c61;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      font-family: 'Roboto', Arial, Helvetica, sans-serif;
+      color: var(--text);
+      padding: 20px;
+      overflow-x: auto;
+    }
+
+    .dashboard {
+      width: 100%;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding-bottom: 50px;
+    }
+    .engine-dashboard {
+      position: absolute;
+      left: -12000px;
+      top: 0;
+      width: 1440px;
+      opacity: 0;
+      pointer-events: none;
+      z-index: -1;
+    }
+    .hidden { display: none !important; }
+    .chat-app {
+      width: min(1420px, calc(100vw - 48px));
+      height: min(86vh, 920px);
+      margin: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+      padding: 0;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      overflow: hidden;
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 120;
+    }
+    .chat-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid #e6eaee;
+      background: #f8fbfe;
+    }
+    .chat-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: #1f3f57;
+    }
+    .chat-sub {
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: #617383;
+    }
+    .chat-close {
+      border: 0;
+      background: transparent;
+      color: #5f6d76;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+    .chat-close:hover {
+      background: #edf3f7;
+    }
+    .chat-thread {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 0;
+      overflow: auto;
+      padding: 16px;
+    }
+    .chat-empty {
+      border: 1px dashed #c7d8e4;
+      background: #f9fcff;
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .chat-empty-title {
+      margin: 0 0 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #35586d;
+    }
+    .chat-empty-sub {
+      margin: 0 0 12px;
+      font-size: 12px;
+      color: #637583;
+    }
+    .chat-prompt-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .chat-composer {
+      border-top: 1px solid #e6eaee;
+      padding: 12px 16px;
+      background: #fff;
+    }
+    .chat-launcher {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 121;
+      border: 0;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #1a55d1, #0f3fb8);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 12px 18px;
+      box-shadow: 0 10px 20px rgba(17, 56, 145, 0.35);
+      cursor: pointer;
+    }
+    .chat-launcher:hover {
+      filter: brightness(1.04);
+    }
+    .chat-msg {
+      display: flex;
+      width: 100%;
+    }
+    .chat-msg.user {
+      justify-content: flex-end;
+    }
+    .chat-bubble {
+      max-width: 68%;
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-size: 13px;
+      line-height: 1.4;
+      border: 1px solid #d5e8f3;
+      background: #eef8ff;
+      color: #1f4960;
+      font-weight: 500;
+    }
+    .chat-response {
+      width: 100%;
+      border: 1px solid #dfe3e8;
+      border-radius: 10px;
+      padding: 12px;
+      background: #fbfcfd;
+    }
+    .chat-response-head {
+      font-size: 13px;
+      color: #5b6670;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .chat-widget-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+      align-items: stretch;
+      grid-auto-rows: auto;
+    }
+    .chat-widget-grid .widget.chat-widget-card {
+      grid-column: span 2;
+      width: 100%;
+      min-height: 560px;
+      height: auto;
+      margin: 0;
+      box-shadow: none;
+      border-radius: 8px;
+      padding: 12px;
+      border-color: #dfe3e8;
+      background: #fff;
+      overflow: hidden;
+      align-self: stretch;
+    }
+    .chat-widget-grid .widget.chat-widget-card.chat-full-width {
+      grid-column: 1 / -1;
+      height: auto;
+      min-height: 0;
+    }
+    .chat-widget-grid .widget.chat-widget-card.chat-two-up {
+      grid-column: span 3;
+    }
+    .chat-widget-grid .widget.chat-widget-card.chat-one-up {
+      grid-column: 1 / -1;
+    }
+    .chat-widget-grid .widget.chat-widget-card.chat-single-row {
+      height: auto;
+      min-height: 0;
+    }
+    .chat-widget-card .widget-title {
+      font-size: 17px;
+      margin-bottom: 8px;
+    }
+    .chat-widget-card .widget-body {
+      overflow: visible;
+      padding-right: 0;
+      gap: 8px;
+      min-height: 0;
+    }
+    .chat-widget-card.chat-spread .widget-body,
+    .chat-widget-card.chat-row-spread .widget-body {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .chat-widget-card .widget-footer {
+      margin-top: auto;
+      padding-top: 8px;
+    }
+    .chat-widget-card.chat-full-width .widget-footer,
+    .chat-widget-card.chat-single-row .widget-footer {
+      margin-top: 8px;
+      padding-top: 0;
+    }
+    .chat-widget-card .foot-link {
+      font-size: 11px;
+      padding: 6px 10px;
+    }
+    .chat-widget-card .comments-list,
+    .chat-widget-card .deadline-list,
+    .chat-widget-card .service-list,
+    .chat-widget-card .contracts-list,
+    .chat-widget-card .dynamic-list,
+    .chat-widget-card .issues-list,
+    .chat-widget-card .table-scroll {
+      max-height: none;
+      overflow: visible;
+    }
+    .chat-widget-card.chat-spread .comments-list,
+    .chat-widget-card.chat-spread .deadline-list,
+    .chat-widget-card.chat-spread .service-list,
+    .chat-widget-card.chat-spread .contracts-list,
+    .chat-widget-card.chat-spread .dynamic-list,
+    .chat-widget-card.chat-spread .issues-list,
+    .chat-widget-card.chat-row-spread .comments-list,
+    .chat-widget-card.chat-row-spread .deadline-list,
+    .chat-widget-card.chat-row-spread .service-list,
+    .chat-widget-card.chat-row-spread .contracts-list,
+    .chat-widget-card.chat-row-spread .dynamic-list,
+    .chat-widget-card.chat-row-spread .issues-list {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      flex: 1 1 auto;
+    }
+    .chat-widget-card.chat-spread .comment-row,
+    .chat-widget-card.chat-spread .deadline-row,
+    .chat-widget-card.chat-spread .service-row,
+    .chat-widget-card.chat-spread .contract-row,
+    .chat-widget-card.chat-spread .dynamic-row,
+    .chat-widget-card.chat-spread .issue-row,
+    .chat-widget-card.chat-row-spread .comment-row,
+    .chat-widget-card.chat-row-spread .deadline-row,
+    .chat-widget-card.chat-row-spread .service-row,
+    .chat-widget-card.chat-row-spread .contract-row,
+    .chat-widget-card.chat-row-spread .dynamic-row,
+    .chat-widget-card.chat-row-spread .issue-row {
+      flex: 1 1 0;
+      align-items: center;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    .chat-widget-card.chat-issues-spread .issues-list {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex: 1 1 auto;
+      height: 100%;
+    }
+    .chat-widget-card.chat-issues-spread .issue-row {
+      flex: 1 1 0;
+      align-items: center;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    .chat-widget-card.chat-risk-spread .widget-body {
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-widget-card.chat-risk-spread .table-scroll {
+      flex: 1 1 auto;
+      display: flex;
+      min-height: 0;
+    }
+    .chat-widget-card.chat-risk-spread .table {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+    }
+    .chat-widget-card.chat-risk-spread .table tbody tr {
+      height: calc(100% / var(--risk-rows, 6));
+    }
+    .chat-widget-card .chart-box {
+      min-height: 250px;
+      height: 250px;
+      width: 100%;
+      padding: 0;
+      border: 0;
+    }
+    .chat-widget-card .echart {
+      min-height: 250px;
+      height: 250px;
+      width: 100%;
+    }
+    .chat-widget-card .chart-box.chart-mini {
+      min-height: 190px;
+      height: 190px;
+      flex: 0 0 190px;
+    }
+    .chat-widget-card .mini-legend {
+      margin-bottom: 6px;
+      font-size: 11px;
+      gap: 8px;
+    }
+    .chat-widget-card .comments-summary strong,
+    .chat-widget-card .deadline-summary strong,
+    .chat-widget-card .service-summary strong,
+    .chat-widget-card .contracts-summary strong,
+    .chat-widget-card .assets-summary strong,
+    .chat-widget-card .budget-summary strong,
+    .chat-widget-card .dynamic-summary strong {
+      font-size: 32px;
+    }
+    .chat-widget-card img.chat-chart-img {
+      width: 100%;
+      height: 250px;
+      object-fit: fill;
+      display: block;
+      border: 0;
+      border-radius: 6px;
+      background: #fff;
+    }
+    .chat-widget-card.widget-chat-compliance .chart-box,
+    .chat-widget-card.widget-chat-compliance .echart,
+    .chat-widget-card.widget-chat-compliance img.chat-chart-img {
+      min-height: 270px;
+      height: 290px;
+    }
+    .chat-widget-card.chat-single-row .chart-box,
+    .chat-widget-card.chat-single-row .echart,
+    .chat-widget-card.chat-single-row img.chat-chart-img {
+      min-height: 180px;
+      height: 180px;
+    }
+    .chat-loading {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid #dfe3e8;
+      background: #ffffff;
+      color: #5b6670;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .chat-loading-dots {
+      display: inline-flex;
+      gap: 4px;
+    }
+    .chat-loading-dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #4f95c2;
+      animation: chatPulse 1s infinite ease-in-out;
+      opacity: .35;
+    }
+    .chat-loading-dots span:nth-child(2) { animation-delay: 0.12s; }
+    .chat-loading-dots span:nth-child(3) { animation-delay: 0.24s; }
+    @keyframes chatPulse {
+      0%, 100% { opacity: .3; transform: translateY(0); }
+      50% { opacity: 1; transform: translateY(-2px); }
+    }
+
+    .ai-shell {
+      width: 100%;
+      max-width: 1440px;
+      margin: 0 auto 30px;
+      background:
+        radial-gradient(1200px 280px at 10% -60%, rgba(22, 159, 221, 0.2), transparent 55%),
+        radial-gradient(900px 220px at 95% -50%, rgba(31, 157, 214, 0.16), transparent 60%),
+        #f8fcff;
+      border: 1px solid #a7d8ee;
+      border-radius: 6px;
+      padding: 18px;
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      box-shadow: 0 10px 22px rgba(16, 126, 176, 0.2);
+    }
+    .ai-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .ai-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #0f3f57;
+      margin: 0;
+      letter-spacing: 0.01em;
+    }
+    .ai-sub {
+      margin: 0;
+      font-size: 13px;
+      color: #4f6c7e;
+    }
+    .ai-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+    .prompt-chip {
+      border: 1px solid #b9deed;
+      border-radius: 6px;
+      background: #f1faff;
+      color: #2f5f7a;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: left;
+      padding: 10px;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+    .prompt-chip:hover {
+      border-color: #7ac3e2;
+      background: #e8f7ff;
+    }
+    .prompt-chip.active {
+      border-color: #4caad5;
+      background: #dff3ff;
+      color: #114f6d;
+      box-shadow: inset 0 0 0 1px rgba(15, 103, 145, 0.14);
+    }
+    .ai-controls {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .ai-input {
+      width: 100%;
+      border: 1px solid #9fcbdf;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 14px;
+      color: #3e4b55;
+      background: #fff;
+    }
+    .ai-input:focus-visible {
+      outline: 2px solid #1a9ad6;
+      outline-offset: 1px;
+    }
+    .ai-run {
+      border: 0;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #1297d2, #0e79ad);
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(19, 120, 169, 0.28);
+    }
+    .ai-run:hover { filter: brightness(1.03); }
+    .ai-meta {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #3f6478;
+    }
+    .top-hero {
+      height: 110px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 14px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      position: relative;
+    }
+
+    .hero-title { font-size: 16px; font-weight: 700; }
+    .hero-sub-row { display: block; }
+    .hero-sub { font-size: 13px; color: #6f767d; }
+    .hero-event-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #68737c;
+      margin-top: 4px;
+    }
+    .event-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid #f4c98b;
+      background: #fff5e7;
+      color: #a86c0f;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .01em;
+    }
+    .banner-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+    }
+
+    body.auth-locked > :not(.email-gate) {
+      display: none !important;
+    }
+    .email-gate {
+      min-height: calc(100vh - 40px);
+      width: 100%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    body.auth-locked .email-gate {
+      display: flex;
+    }
+    .email-card {
+      width: 430px;
+      max-width: 100%;
+      background: #fff;
+      border: 1px solid #d7e1e8;
+      border-radius: 8px;
+      padding: 22px;
+      box-shadow: 0 12px 28px rgba(18, 43, 58, 0.15);
+    }
+    .email-title {
+      margin: 0 0 6px;
+      font-size: 24px;
+      font-weight: 700;
+      color: #0f3f57;
+    }
+    .email-sub {
+      margin: 0 0 14px;
+      font-size: 13px;
+      color: #607080;
+    }
+    .email-error {
+      margin-top: 8px;
+      color: #c0392b;
+      font-size: 12px;
+      min-height: 18px;
+    }
+
+
+    .demo-switch {
+      width: 100%;
+      max-width: 1440px;
+      margin: 0 auto 30px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .filters {
+      min-height: 64px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #fff;
+      padding: 10px 12px;
+      display: grid;
+      grid-template-columns: 240px 240px 1fr 260px;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .customer-segment {
+      display: inline-flex;
+      border: 1px solid #cfd8dc;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #f4f6f8;
+    }
+    .customer-segment .seg-btn {
+      border: 0;
+      border-right: 1px solid #cfd8dc;
+      min-width: 92px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #49545d;
+      background: transparent;
+      cursor: pointer;
+    }
+    .customer-segment .seg-btn:last-child { border-right: 0; }
+    .customer-segment .seg-btn.active {
+      color: #fff;
+    }
+    .customer-segment .seg-btn.active[data-customer="block"] {
+      background: #0e7c66;
+    }
+    .customer-segment .seg-btn.active[data-customer="lettings"] {
+      background: #b35c00;
+    }
+
+    .range-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .tab-group {
+      display: inline-flex;
+      justify-self: start;
+      border: 1px solid #d7e8f1;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #f8fcfe;
+    }
+    .tab {
+      border: 0;
+      border-right: 1px solid #d7e8f1;
+      min-width: 140px;
+      padding: 9px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #5f6d76;
+      background: transparent;
+      cursor: pointer;
+    }
+    .tab:last-child { border-right: 0; }
+    .tab.active { background: var(--blue); color: #fff; }
+
+    .range-trigger {
+      flex-shrink: 0;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border-color: #d7e8f1;
+      color: #486172;
+      background: #f8fcfe;
+    }
+    .range-trigger.active {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+
+    .updated {
+      text-align: right;
+      color: #808993;
+      font-size: 12px;
+    }
+
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .kpi-card {
+      height: 140px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 10px 14px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    .kpi-title { font-size: 18px; color: #767d84; }
+    .kpi-value {
+      font-size: 50px;
+      line-height: 1;
+      text-align: center;
+      margin-top: 14px;
+    }
+    .kpi-value,
+    .comments-summary strong,
+    .deadline-summary strong,
+    .service-summary strong,
+    .contracts-summary strong,
+    .assets-summary strong,
+    .budget-summary strong,
+    .dynamic-summary strong,
+    #issuesBody .issue-status,
+    #commentsBody .comment-title,
+    #deadlinesBody .deadline-title,
+    #serviceBody .service-title,
+    #contractsBody .contract-title,
+    .dynamic-list .dynamic-title,
+    #riskBody tr td:first-child,
+    #assetsBody tr td:first-child {
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 2px;
+      text-decoration-color: currentColor;
+      cursor: pointer;
+    }
+
+    .kpi-row .kpi-card:nth-child(1) .kpi-value { color: var(--blue); }
+    .kpi-row .kpi-card:nth-child(2) .kpi-value { color: var(--amber); }
+    .kpi-row .kpi-card:nth-child(3) .kpi-value { color: var(--red); }
+
+    .row-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 30px;
+      justify-content: start;
+      margin-bottom: 30px;
+    }
+    .row-grid.single-col {
+      grid-template-columns: 1fr;
+      justify-content: start;
+    }
+    .row-grid.hidden-row { display: none; }
+
+    .widget {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 420px;
+      min-width: 0;
+    }
+
+    .h-300 { height: 420px; }
+    .h-320 { height: 420px; }
+    .h-340 { height: 420px; }
+    .h-360 { height: 420px; }
+
+    .widget-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1f252b;
+      margin-bottom: 12px;
+      flex: 0 0 auto;
+    }
+
+    .widget-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+      padding-right: 2px;
+      display: flex;
+      flex-direction: column;
+    }
+    .widget-footer {
+      margin-top: 10px;
+      flex: 0 0 auto;
+    }
+
+    .foot-link {
+      display: inline-block;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 7px 14px;
+      color: #2e343a;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      background: #fafbfc;
+    }
+
+    .tiny-score {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .tiny-score > div { text-align: center; font-size: 13px; color: #666d73; }
+    .tiny-score strong {
+      display: block;
+      font-size: 24px;
+      line-height: 1.1;
+      margin-bottom: 2px;
+      font-weight: 700;
+    }
+
+    .service-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 13px;
+      color: #666d73;
+    }
+    .service-grid strong {
+      display: block;
+      font-size: 24px;
+      line-height: 1.1;
+      margin-top: 2px;
+    }
+
+    .service-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      background: #f2f4f6;
+      border-radius: 10px;
+      padding: 12px 10px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .service-summary strong {
+      display: block;
+      font-size: 38px;
+      line-height: 1;
+      font-weight: 700;
+    }
+    .service-summary span {
+      display: block;
+      margin-top: 4px;
+      font-size: 16px;
+      color: #5f6972;
+    }
+    .service-list {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+      border-top: 1px solid #ebedf0;
+    }
+    .service-row {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 152px;
+      gap: 10px;
+      align-items: center;
+      justify-items: start;
+      padding: 10px 4px;
+      border-bottom: 1px solid #ebedf0;
+    }
+    .service-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1f252b;
+      line-height: 1.2;
+    }
+    .service-sub {
+      font-size: 12px;
+      color: #606b75;
+      margin-top: 2px;
+      line-height: 1.2;
+    }
+    .service-next {
+      font-size: 13px;
+      color: #4f5963;
+      font-weight: 600;
+      white-space: nowrap;
+      text-align: left;
+      justify-self: start;
+    }
+    .service-status {
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      border-radius: 8px;
+      padding: 3px 9px;
+      white-space: nowrap;
+      display: inline-block;
+    }
+    .service-status.due-soon { background: #ff9f1c; }
+    .service-status.non-compliant { background: #d94c61; }
+    .service-status.compliant { background: #2f9c5d; }
+
+    .contracts-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      background: #f2f4f6;
+      border-radius: 10px;
+      padding: 12px 10px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .contracts-summary strong {
+      display: block;
+      font-size: 38px;
+      line-height: 1;
+      font-weight: 700;
+    }
+    .contracts-summary span {
+      display: block;
+      margin-top: 4px;
+      font-size: 16px;
+      color: #5f6972;
+    }
+    .budget-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      background: #f2f4f6;
+      border-radius: 10px;
+      padding: 12px 10px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .budget-summary strong {
+      display: block;
+      font-size: 38px;
+      line-height: 1;
+      font-weight: 700;
+    }
+    .budget-summary span {
+      display: block;
+      margin-top: 4px;
+      font-size: 16px;
+      color: #5f6972;
+    }
+    .contracts-list {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+      border-top: 1px solid #ebedf0;
+    }
+    .contract-row {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 152px;
+      gap: 10px;
+      align-items: center;
+      justify-items: start;
+      padding: 10px 4px;
+      border-bottom: 1px solid #ebedf0;
+    }
+    .contract-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1f252b;
+      line-height: 1.2;
+    }
+    .contract-sub {
+      font-size: 12px;
+      color: #606b75;
+      margin-top: 2px;
+      line-height: 1.2;
+    }
+    .contract-ending {
+      font-size: 13px;
+      color: #4f5963;
+      font-weight: 600;
+      white-space: nowrap;
+      text-align: left;
+      justify-self: start;
+    }
+    .contract-status {
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      border-radius: 8px;
+      padding: 3px 9px;
+      white-space: nowrap;
+      display: inline-block;
+      background: #ff9f1c;
+    }
+
+    .dynamic-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      background: #f2f4f6;
+      border-radius: 10px;
+      padding: 12px 10px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .dynamic-summary strong {
+      display: block;
+      font-size: 38px;
+      line-height: 1;
+      font-weight: 700;
+    }
+    .dynamic-summary span {
+      display: block;
+      margin-top: 4px;
+      font-size: 16px;
+      color: #5f6972;
+    }
+    .dynamic-list {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+      border-top: 1px solid #ebedf0;
+    }
+    .dynamic-row {
+      display: grid;
+      grid-template-columns: 1.45fr 1fr 152px;
+      gap: 10px;
+      align-items: center;
+      justify-items: start;
+      padding: 10px 4px;
+      border-bottom: 1px solid #ebedf0;
+    }
+    .dynamic-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1f252b;
+      line-height: 1.2;
+    }
+    .dynamic-sub {
+      font-size: 12px;
+      color: #606b75;
+      margin-top: 2px;
+      line-height: 1.2;
+    }
+    .dynamic-middle {
+      font-size: 13px;
+      color: #4f5963;
+      font-weight: 600;
+      white-space: nowrap;
+      text-align: left;
+      justify-self: start;
+    }
+    .dynamic-status {
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      border-radius: 8px;
+      padding: 3px 9px;
+      white-space: nowrap;
+      display: inline-block;
+      background: #169fdd;
+    }
+    .dynamic-status.new { background: #169fdd; }
+    .dynamic-status.pending { background: #8f8f8f; }
+    .dynamic-status.confirmed { background: #2f9c5d; }
+    .dynamic-status.in-progress { background: #169fdd; }
+    .dynamic-status.awaiting-approval { background: #ff9f1c; color: #1f252b; }
+    .dynamic-status.urgent { background: #d94c61; }
+    .dynamic-status.review-needed { background: #d94c61; }
+    .dynamic-status.due-soon { background: #ff9f1c; }
+
+    .comments-summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      background: #f2f4f6;
+      border-radius: 10px;
+      padding: 12px 10px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .comments-summary strong {
+      display: block;
+      font-size: 38px;
+      line-height: 1;
+      font-weight: 700;
+    }
+    .comments-summary span {
+      display: block;
+      margin-top: 4px;
+      font-size: 16px;
+      color: #5f6972;
+    }
+    .comments-list {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+      border-top: 1px solid #ebedf0;
+    }
+    .comment-row {
+      display: grid;
+      grid-template-columns: 1.6fr 0.9fr 152px;
+      gap: 10px;
+      align-items: center;
+      justify-items: start;
+      padding: 10px 4px;
+      border-bottom: 1px solid #ebedf0;
+    }
+    .comment-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1f252b;
+      line-height: 1.2;
+    }
+    .comment-sub {
+      font-size: 12px;
+      color: #606b75;
+      margin-top: 2px;
+      line-height: 1.2;
+    }
+    .comment-actor {
+      font-size: 13px;
+      color: #4f5963;
+      font-weight: 600;
+      white-space: nowrap;
+      text-align: left;
+      justify-self: start;
+    }
+
+    .mini-legend {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      font-size: 12px;
+      color: #757d85;
+      margin-bottom: 10px;
+    }
+    .trend-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+
+    .deadline-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      background: #f2f4f6;
+      border-radius: 10px;
+      padding: 12px 10px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .deadline-summary strong {
+      display: block;
+      font-size: 38px;
+      line-height: 1;
+      font-weight: 700;
+    }
+    .deadline-summary span {
+      display: block;
+      margin-top: 4px;
+      font-size: 16px;
+      color: #5f6972;
+    }
+    .deadline-list {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+      border-top: 1px solid #ebedf0;
+    }
+    .deadline-row {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 152px;
+      gap: 10px;
+      align-items: center;
+      justify-items: start;
+      padding: 10px 4px;
+      border-bottom: 1px solid #ebedf0;
+    }
+    .deadline-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1f252b;
+      line-height: 1.2;
+    }
+    .deadline-sub {
+      font-size: 12px;
+      color: #606b75;
+      margin-top: 2px;
+      line-height: 1.2;
+    }
+    .deadline-due {
+      font-size: 13px;
+      color: #4f5963;
+      font-weight: 600;
+      white-space: nowrap;
+      text-align: left;
+      justify-self: start;
+    }
+
+    .service-row > :nth-child(2),
+    .contract-row > :nth-child(2),
+    .dynamic-row > :nth-child(2),
+    .comment-row > :nth-child(2),
+    .deadline-row > :nth-child(2),
+    .service-next,
+    .contract-ending,
+    .dynamic-middle,
+    .comment-actor,
+    .deadline-due {
+      display: block !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      text-align: left !important;
+      justify-self: start !important;
+      align-self: center;
+      justify-content: flex-start !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .service-row > :nth-child(3),
+    .contract-row > :nth-child(3),
+    .dynamic-row > :nth-child(3),
+    .comment-row > :nth-child(3),
+    .deadline-row > :nth-child(3) {
+      width: 100%;
+      justify-self: start !important;
+      text-align: left !important;
+      padding-left: 6px;
+    }
+    .service-status,
+    .contract-status,
+    .dynamic-status,
+    .deadline-badge,
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+      text-align: left;
+    }
+    .deadline-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      border-radius: 8px;
+      padding: 3px 9px;
+      white-space: nowrap;
+      display: inline-block;
+    }
+    .deadline-badge.past { background: #d94c61; }
+    .deadline-badge.approaching { background: #ff9f1c; }
+    .deadline-badge.upcoming { background: #169fdd; }
+
+    .pill {
+      font-size: 12px;
+      border-radius: 12px;
+      padding: 3px 8px;
+      border: 1px solid;
+      white-space: nowrap;
+      display: inline-block;
+    }
+    .p-blue { color: var(--blue); border-color: #99daf3; background: #edf8fd; }
+    .p-green { color: var(--green); border-color: #b7dfca; background: #f1faf5; }
+    .p-amber { color: #d98c00; border-color: #ffd490; background: #fff8eb; }
+    .p-red { color: var(--red); border-color: #f1bec8; background: #fff1f3; }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      display: inline-block;
+      border: 1px solid #d9d9d9;
+    }
+
+    .assets-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      background: #f2f4f6;
+      border-radius: 10px;
+      padding: 12px 10px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .assets-summary strong {
+      display: block;
+      font-size: 38px;
+      line-height: 1;
+      font-weight: 700;
+    }
+    .assets-summary span {
+      display: block;
+      margin-top: 4px;
+      font-size: 16px;
+      color: #5f6972;
+    }
+    .asset-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1;
+      background: #e9edf1;
+      color: #1f252b;
+    }
+    .asset-chip.total {
+      background: #dfe3e8;
+      color: #2d3338;
+    }
+    .asset-chip.compliant {
+      background: #c9ddd6;
+      color: #1f8f5e;
+    }
+    .asset-chip.risk {
+      background: #f4dcc6;
+      color: #f08a00;
+    }
+    .asset-chip.non {
+      background: #efcdd4;
+      color: #d94c61;
+    }
+
+    .risk-dot {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .risk-dot.critical {
+      background: #f4d5db;
+      color: #d94c61;
+    }
+    .risk-dot.overdue {
+      background: #f6e7bf;
+      color: #ff9f1c;
+    }
+    .risk-total {
+      color: #4e5862;
+      font-weight: 600;
+      cursor: help;
+    }
+    .risk-rate {
+      font-weight: 700;
+      cursor: help;
+    }
+    .risk-rate.low { color: #2f9c5d; }
+    .risk-rate.medium { color: #ff9f1c; }
+    .risk-rate.high { color: #d94c61; }
+    .risk-dot { cursor: help; }
+    .tooltip {
+      --bs-tooltip-max-width: 300px;
+      --bs-tooltip-bg: #202327;
+      --bs-tooltip-color: #fff;
+      --bs-tooltip-opacity: 1;
+      font-family: 'Roboto', Arial, Helvetica, sans-serif;
+    }
+
+    .issues-list {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+      border-top: 1px solid #ebedf0;
+    }
+    .issue-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 11px 4px;
+      border-bottom: 1px solid #ebedf0;
+      cursor: pointer;
+    }
+    .issue-row.active {
+      background: #eef8fc;
+    }
+    .issue-status {
+      font-size: 14px;
+      color: #1f252b;
+      line-height: 1.2;
+    }
+    .issue-count {
+      font-size: 22px;
+      font-weight: 700;
+      color: #4f5963;
+      min-width: 30px;
+      text-align: right;
+    }
+
+    .table {
+      font-size: 13px;
+      margin-bottom: 0;
+    }
+    .table.table-sm > :not(caption) > * > * {
+      padding: 0.45rem 0.55rem;
+    }
+    .table thead th {
+      color: #1f252b;
+      font-weight: 600;
+      background: #fff;
+    }
+
+    .table-scroll {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+    }
+    .table-scroll .table thead th {
+      position: static;
+    }
+
+    .chart-box {
+      border: 1px solid #eef1f4;
+      background: #fff;
+      border-radius: 4px;
+      height: 100%;
+      min-height: 0;
+      padding: 6px;
+      flex: 1 1 auto;
+    }
+    .chart-box.chart-mini {
+      height: 150px;
+      flex: 0 0 150px;
+    }
+
+    .echart {
+      width: 100%;
+      height: 100%;
+      min-height: 180px;
+    }
+    .echart.echart-sm {
+      min-height: 0;
+    }
+    #widget-compliance { height: 420px; }
+    #widget-compliance .mini-legend {
+      margin-bottom: 6px;
+    }
+    #widget-compliance .widget-body {
+      overflow: hidden;
+    }
+    #widget-compliance .chart-box {
+      min-height: 300px;
+      height: auto;
+      flex: 1 1 auto;
+    }
+    #widget-compliance .echart {
+      min-height: 290px;
+    }
+    #widget-budgets .chart-box {
+      border: 0;
+      background: transparent;
+      padding: 0;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 1480px) {
+      .filters {
+        height: auto;
+        grid-template-columns: 1fr;
+      }
+      .updated { text-align: left; }
+      .tab { min-width: 0; flex: 1; }
+      .range-wrap { flex-direction: column; align-items: stretch; }
+      .ai-grid { grid-template-columns: 1fr 1fr; }
+      .ai-controls { grid-template-columns: 1fr; }
+      .row-grid,
+      .row-grid.single-col {
+        grid-template-columns: 1fr;
+      }
+      .widget {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .row-grid,
+      .kpi-row { grid-template-columns: 1fr; }
+      .ai-grid { grid-template-columns: 1fr; }
+      .chat-widget-grid { grid-template-columns: 1fr; }
+      .chat-widget-grid .widget.chat-widget-card,
+      .chat-widget-grid .widget.chat-widget-card.chat-two-up,
+      .chat-widget-grid .widget.chat-widget-card.chat-one-up {
+        grid-column: 1 / -1;
+      }
+      .chat-prompt-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="auth-locked">
+  <section class="email-gate" id="emailGate" aria-label="Email access gate">
+    <form class="email-card" id="emailGateForm">
+      <h2 class="email-title">Fixflo Workspace</h2>
+      <p class="email-sub">Enter your work email to view the demo.</p>
+      <div class="mb-2">
+        <label for="emailGateInput" class="form-label">Work email</label>
+        <input id="emailGateInput" class="form-control" type="email" autocomplete="email" required>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Access demo</button>
+      <div class="email-error" id="emailGateError"></div>
+    </form>
+  </section>
+
+  <section class="demo-switch">
+    <div class="customer-segment" role="tablist" aria-label="Customer type">
+      <button type="button" class="seg-btn active" data-customer="block" role="tab" aria-selected="true">Block</button>
+      <button type="button" class="seg-btn" data-customer="lettings" role="tab" aria-selected="false">Lettings</button>
+    </div>
+  </section>
+
+  <section class="chat-app hidden" id="chatApp">
+    <header class="chat-header">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+        <div>
+          <h1 class="chat-title">Aareon Rae</h1>
+          <p class="chat-sub">Ask a question and get a visual dashboard response using live widget formats.</p>
+        </div>
+        <button type="button" class="chat-close" id="closeRae" aria-label="Close AI window">×</button>
+      </div>
+    </header>
+    <div class="chat-thread" id="chatThread">
+      <div class="chat-empty" id="chatEmpty">
+        <h2 class="chat-empty-title">Start with a prompt</h2>
+        <p class="chat-empty-sub">Choose a suggested prompt or type your own in the composer below. A visual dashboard response will appear here.</p>
+      </div>
+    </div>
+    <div class="chat-composer">
+      <div class="chat-prompt-grid" id="promptGrid">
+        <button type="button" class="prompt-chip" id="chip1" data-prompt="As a compliance manager, show statutory compliance risk and overdue actions for the next 30 days.">Compliance manager risk view</button>
+        <button type="button" class="prompt-chip" id="chip2" data-prompt="As a portfolio lead, show urgent operational risks and items needing action.">Portfolio operations view</button>
+        <button type="button" class="prompt-chip" id="chip3" data-prompt="As a leaseholder, show important building updates, documents and decisions relevant to my block.">Leaseholder view</button>
+        <button type="button" class="prompt-chip" id="chip4" data-prompt="As a property manager, show maintenance schedule, inspections and resident request workload.">Property manager operations view</button>
+      </div>
+      <div class="ai-controls">
+        <input id="aiPromptInput" class="ai-input" type="text" placeholder="Type your prompt to generate a dashboard view..." />
+        <button id="runAiPrompt" class="ai-run" type="button">Send</button>
+      </div>
+    </div>
+  </section>
+  <button type="button" class="chat-launcher" id="openRae">Aareon Rae</button>
+
+  <main class="dashboard engine-dashboard" id="dashboardRoot">
+    <section class="top-hero">
+      <button type="button" class="btn-close banner-close" id="dismissBanner" aria-label="Close event banner"></button>
+      <div class="hero-title" id="eventTitle">Upcoming event: Portfolio Operations Review</div>
+      <div class="hero-sub-row">
+        <div>
+          <div class="hero-sub" id="eventDescription">Portfolio: Mixed-use properties | Wednesday, March 4, 2026 | 10:00 AM to 11:30 AM. Review priorities by persona and confirm next actions.</div>
+          <div class="hero-event-meta"><span class="event-badge" id="eventBadge">Upcoming</span><span id="eventAudience">Audience: Portfolio leads, tenants, PMs and compliance teams</span><span class="event-badge" id="activePersonaBadge">Persona: Property manager</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="filters">
+      <label for="propertyFilter" class="sr-only">Select property</label>
+      <select id="propertyFilter" class="form-select">
+        <option value="all">All properties</option>
+        <option value="city">Sales City (PIC)</option>
+        <option value="ecb">ECB</option>
+        <option value="lol">LOL Estates</option>
+      </select>
+
+      <label for="userFilter" class="sr-only">Select dashboard user</label>
+      <select id="userFilter" class="form-select">
+        <option value="me">My dashboard</option>
+        <option value="alex">Alex Morgan</option>
+        <option value="jamie">Jamie Patel</option>
+        <option value="sam">Sam Lee</option>
+      </select>
+
+      <div class="range-wrap">
+        <div class="tab-group" role="tablist" aria-label="Date range">
+          <button type="button" class="tab active" data-month="current" role="tab" aria-selected="true">Current month</button>
+          <button type="button" class="tab" data-month="next" role="tab" aria-selected="false">Next month</button>
+          <button type="button" class="tab" data-month="next6" role="tab" aria-selected="false">Next 6 months</button>
+        </div>
+        <input type="text" id="rangePickerInput" class="sr-only" aria-hidden="true" tabindex="-1">
+        <button type="button" id="rangeDropdownBtn" class="btn btn-outline-secondary btn-sm range-trigger">Custom range</button>
+      </div>
+
+      <div class="updated" id="updatedAt"><span id="updatedText">Last update at 24 Aug 2022 11:22 AM</span></div>
+    </section>
+
+    <section class="kpi-row">
+      <article class="kpi-card">
+        <div class="kpi-title" id="kpiTitle1">Upcoming events</div>
+        <div class="kpi-value" id="kpiUpcoming">21</div>
+      </article>
+      <article class="kpi-card">
+        <div class="kpi-title" id="kpiTitle2">Events past due date</div>
+        <div class="kpi-value" id="kpiPast">25</div>
+      </article>
+      <article class="kpi-card">
+        <div class="kpi-title" id="kpiTitle3">Events approaching due date</div>
+        <div class="kpi-value" id="kpiApproaching">15</div>
+      </article>
+    </section>
+
+    <section class="row-grid">
+      <article class="widget h-300" id="widget-comments">
+        <div class="widget-title">My comments</div>
+        <div class="widget-body">
+          <div class="comments-summary">
+            <div><strong style="color: var(--red);" id="commentUnread">2</strong><span>Unread</span></div>
+            <div><strong style="color: var(--blue);" id="commentRead">3</strong><span>New</span></div>
+          </div>
+          <div class="comments-list" id="commentsBody">
+            <div class="comment-row">
+              <div><div class="comment-title">Combustible items in riser cupboard</div><div class="comment-sub">South Tower</div></div>
+              <div class="comment-actor">Tenant</div>
+              <div><span class="pill p-blue">New</span></div>
+            </div>
+            <div class="comment-row">
+              <div><div class="comment-title">Tree felling required</div><div class="comment-sub">Docklands</div></div>
+              <div class="comment-actor">Landlord</div>
+              <div><span class="pill p-blue">New</span></div>
+            </div>
+            <div class="comment-row">
+              <div><div class="comment-title">Electrical gate servicing visit</div><div class="comment-sub">Central Tower</div></div>
+              <div class="comment-actor">Contractor</div>
+              <div></div>
+            </div>
+          </div>
+        </div>
+        <div class="widget-footer"><a href="#" class="foot-link">View all comments (26)</a></div>
+      </article>
+
+      <article class="widget h-300" id="widget-issues">
+        <div class="widget-title">Issues requiring attention</div>
+        <div class="widget-body">
+          <div class="issues-list" id="issuesBody">
+            <div class="issue-row"><div class="issue-status">Reported</div><div class="issue-count">106</div></div>
+            <div class="issue-row"><div class="issue-status">Awaiting instructions</div><div class="issue-count">75</div></div>
+            <div class="issue-row"><div class="issue-status">Awaiting job completion</div><div class="issue-count">52</div></div>
+            <div class="issue-row"><div class="issue-status">Job awarded, awaiting appointment date acceptance</div><div class="issue-count">30</div></div>
+            <div class="issue-row"><div class="issue-status">Remedials raised</div><div class="issue-count">15</div></div>
+          </div>
+        </div>
+        <div class="widget-footer"><a href="#" class="foot-link">View all issues (230)</a></div>
+      </article>
+    </section>
+
+    <section class="row-grid">
+      <article class="widget h-320" id="widget-compliance">
+        <div class="widget-title">Compliance by category</div>
+        <div class="widget-body">
+          <div class="mini-legend"><span><span class="dot" style="background: var(--red)"></span>Non-compliant</span><span><span class="dot" style="background: var(--green)"></span>Compliant</span></div>
+          <div class="chart-box"><div id="categoryChart" class="echart"></div></div>
+        </div>
+        <div class="widget-footer"><a href="#" class="foot-link">Compliance matrix</a></div>
+      </article>
+
+      <article class="widget h-320" id="widget-deadlines">
+        <div class="widget-title">Upcoming deadlines</div>
+        <div class="widget-body">
+          <div class="deadline-summary">
+            <div><strong style="color:var(--blue);" id="deadlineUpcoming">16</strong><span>Upcoming</span></div>
+            <div><strong style="color:var(--amber);" id="deadlineApproaching">3</strong><span>Approaching due date</span></div>
+            <div><strong style="color:var(--red);" id="deadlinePast">8</strong><span>Past due date</span></div>
+          </div>
+          <div class="deadline-list" id="deadlinesBody">
+            <div class="deadline-row">
+              <div><div class="deadline-title">EICR</div><div class="deadline-sub">Center Block</div></div>
+              <div class="deadline-due">Due: 2025-06-14</div>
+              <div><span class="deadline-badge past">Past</span></div>
+            </div>
+            <div class="deadline-row">
+              <div><div class="deadline-title">Gas Safety CP12</div><div class="deadline-sub">Block North</div></div>
+              <div class="deadline-due">Due: 2025-06-14</div>
+              <div><span class="deadline-badge past">Past</span></div>
+            </div>
+            <div class="deadline-row">
+              <div><div class="deadline-title">LOLER inspection</div><div class="deadline-sub">Heritage House</div></div>
+              <div class="deadline-due">Due: 2025-06-14</div>
+              <div><span class="deadline-badge approaching">Approaching</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="widget-footer"><a href="#" class="foot-link" id="deadlinesFooter">View all blocks (260)</a></div>
+      </article>
+    </section>
+
+    <section class="row-grid">
+      <article class="widget h-320" id="widget-risk">
+        <div class="widget-title">Higher risk buildings</div>
+        <div class="widget-body">
+          <div class="table-scroll">
+            <table class="table table-sm align-middle">
+              <thead><tr><th>Block</th><th>Critical</th><th>Overdue</th><th>Total</th><th>Rate</th></tr></thead>
+              <tbody id="riskBody">
+                <tr><td>Brookfield Mansions</td><td><span class="risk-dot critical" data-bs-toggle="tooltip" data-bs-title="Critical issues (2): FRA expired; Gas certificate expired.">2</span></td><td><span class="risk-dot overdue" data-bs-toggle="tooltip" data-bs-title="Overdue issues (6): EICR inspection overdue; Emergency lighting overdue; Asbestos reassessment overdue and 3 more.">6</span></td><td><span class="risk-total" data-bs-toggle="tooltip" data-bs-title="Total flagged compliance actions: 8 (2 critical, 6 overdue).">8</span></td><td><span class="risk-rate low" data-bs-toggle="tooltip" data-bs-title="Risk rate for this property: 25%.">25%</span></td></tr>
+                <tr><td>The Bentletts Estate</td><td><span class="risk-dot critical" data-bs-toggle="tooltip" data-bs-title="Critical issues (1): Gas certificate expired.">1</span></td><td><span class="risk-dot overdue" data-bs-toggle="tooltip" data-bs-title="Overdue issues (2): EICR inspection overdue; Emergency lighting overdue.">2</span></td><td><span class="risk-total" data-bs-toggle="tooltip" data-bs-title="Total flagged compliance actions: 2 (1 critical, 2 overdue).">2</span></td><td><span class="risk-rate medium" data-bs-toggle="tooltip" data-bs-title="Risk rate for this property: 50%.">50%</span></td></tr>
+                <tr><td>The Aspire</td><td><span class="risk-dot critical" data-bs-toggle="tooltip" data-bs-title="Critical issues (5): FRA expired; Gas certificate expired; Fire alarm certificate expired and 2 more.">5</span></td><td><span class="risk-dot overdue" data-bs-toggle="tooltip" data-bs-title="Overdue issues (3): EICR inspection overdue; Emergency lighting overdue; Asbestos reassessment overdue.">3</span></td><td><span class="risk-total" data-bs-toggle="tooltip" data-bs-title="Total flagged compliance actions: 4 (5 critical, 3 overdue).">4</span></td><td><span class="risk-rate high" data-bs-toggle="tooltip" data-bs-title="Risk rate for this property: 75%.">75%</span></td></tr>
+                <tr><td>Eton Green</td><td><span class="risk-dot critical" data-bs-toggle="tooltip" data-bs-title="Critical issues (1): FRA expired.">1</span></td><td><span class="risk-dot overdue" data-bs-toggle="tooltip" data-bs-title="Overdue issues (4): EICR inspection overdue; Emergency lighting overdue; Asbestos reassessment overdue and 1 more.">4</span></td><td><span class="risk-total" data-bs-toggle="tooltip" data-bs-title="Total flagged compliance actions: 3 (1 critical, 4 overdue).">3</span></td><td><span class="risk-rate medium" data-bs-toggle="tooltip" data-bs-title="Risk rate for this property: 50%.">50%</span></td></tr>
+                <tr><td>Surrey Heights</td><td><span class="risk-dot critical" data-bs-toggle="tooltip" data-bs-title="Critical issues: none">0</span></td><td><span class="risk-dot overdue" data-bs-toggle="tooltip" data-bs-title="Overdue issues (3): EICR inspection overdue; Emergency lighting overdue; Asbestos reassessment overdue.">3</span></td><td><span class="risk-total" data-bs-toggle="tooltip" data-bs-title="Total flagged compliance actions: 1 (0 critical, 3 overdue).">1</span></td><td><span class="risk-rate high" data-bs-toggle="tooltip" data-bs-title="Risk rate for this property: 60%.">60%</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="widget-footer"><a href="#" class="foot-link" id="riskFooter">View all properties (158)</a></div>
+      </article>
+
+      <article class="widget h-320" id="widget-service">
+        <div class="widget-title">Service events compliance</div>
+        <div class="widget-body">
+          <div class="service-summary">
+            <div><strong style="color: var(--green);" id="svcCompliant">16</strong><span>Compliant</span></div>
+            <div><strong style="color: var(--amber);" id="svcDueSoon">2</strong><span>Due soon</span></div>
+            <div><strong style="color: var(--red);" id="svcNon">3</strong><span>Non-compliant</span></div>
+          </div>
+          <div class="service-list" id="serviceBody">
+            <div class="service-row">
+              <div><div class="service-title">EICR</div><div class="service-sub">Town Block</div></div>
+              <div class="service-next">Next: 2025-06-14</div>
+              <div><span class="service-status due-soon">Due soon</span></div>
+            </div>
+            <div class="service-row">
+              <div><div class="service-title">EICR</div><div class="service-sub">South Block</div></div>
+              <div class="service-next">Next: 2025-06-14</div>
+              <div><span class="service-status due-soon">Due soon</span></div>
+            </div>
+            <div class="service-row">
+              <div><div class="service-title">Lift maintenance</div><div class="service-sub">Tower House</div></div>
+              <div class="service-next">Next: 2025-06-14</div>
+              <div><span class="service-status non-compliant">Non-compliant</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="widget-footer"><a href="#" class="foot-link" id="serviceFooter">View all events (587)</a></div>
+      </article>
+    </section>
+
+    <section class="row-grid">
+      <article class="widget h-360" id="widget-inspection">
+        <div class="widget-title">Site inspection schedule</div>
+        <div class="widget-body">
+          <div class="mini-legend"><span><span class="dot" style="background:#2f9c5d"></span>Completed</span><span><span class="dot" style="background:#1f9dd6"></span>Scheduled</span><span><span class="dot" style="background:#d94c61"></span>Overdue</span></div>
+          <div class="chart-box"><div id="inspectionChart" class="echart"></div></div>
+        </div>
+        <div class="widget-footer"><a href="#" class="foot-link">View all schedules (83)</a></div>
+      </article>
+
+      <article class="widget h-360" id="widget-trend">
+        <div class="widget-title">Compliance forecast <span style="font-size:12px;color:#888;">from previous records</span></div>
+        <div class="widget-body">
+          <div class="trend-head">
+            <div class="mini-legend"><span><span class="dot" style="background:#2f9c5d"></span>Actual</span><span><span class="dot" style="background:#1f9dd6"></span>Forecast</span><span><span class="dot" style="background:#9ecff1"></span>Forecast range</span><span><span class="dot" style="background:#ff9f1c"></span>Target</span></div>
+          </div>
+          <div class="chart-box"><div id="trendChart" class="echart"></div></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="row-grid">
+      <article class="widget h-340" id="widget-contracts">
+        <div class="widget-title">Planned maintenance contracts</div>
+        <div class="widget-body">
+          <div class="contracts-summary">
+            <div><strong style="color: var(--green);" id="contractsActive">1187</strong><span>Active</span></div>
+            <div><strong style="color: var(--amber);" id="contractsExpiring">35</strong><span>Expiring soon</span></div>
+            <div><strong style="color: var(--blue);" id="contractsInactive">13</strong><span>Instructed</span></div>
+          </div>
+          <div class="contracts-list" id="contractsBody">
+            <div class="contract-row">
+              <div><div class="contract-title">Cleaning contract</div><div class="contract-sub">Dawn Cleaning Ltd</div></div>
+              <div class="contract-ending">Ending: 2025-06-14</div>
+              <div><span class="contract-status">Expring soon</span></div>
+            </div>
+            <div class="contract-row">
+              <div><div class="contract-title">Grounds maintenance contract</div><div class="contract-sub">Millar and Co.</div></div>
+              <div class="contract-ending">Ending: 2025-06-14</div>
+              <div><span class="contract-status">Expring soon</span></div>
+            </div>
+            <div class="contract-row">
+              <div><div class="contract-title">Annual fire risk assesment</div><div class="contract-sub">Fire Guard Ltd</div></div>
+              <div class="contract-ending">Ending: 2025-06-14</div>
+              <div><span class="contract-status">Expring soon</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="widget-footer"><a href="#" class="foot-link">View all service agreements (2186)</a></div>
+      </article>
+
+      <article class="widget h-340" id="widget-assets">
+        <div class="widget-title">Assets overview</div>
+        <div class="widget-body">
+          <div class="assets-summary">
+            <div><strong id="assetsTotal">1187</strong><span>Total</span></div>
+            <div><strong style="color: var(--amber);" id="assetsRisk">35</strong><span>At risk</span></div>
+            <div><strong style="color: var(--red);" id="assetsNon">3</strong><span>Non-compliant</span></div>
+          </div>
+          <div class="table-scroll">
+            <table class="table table-sm align-middle">
+              <thead><tr><th>Type</th><th>Total</th><th>Compliant</th><th>At risk</th><th>Non-compliant</th></tr></thead>
+              <tbody id="assetsBody">
+                <tr><td>Fire Safety</td><td><span class="asset-chip total">58</span></td><td><span class="asset-chip compliant">41</span></td><td><span class="asset-chip risk">6</span></td><td><span class="asset-chip non">3</span></td></tr>
+                <tr><td>HVAC</td><td><span class="asset-chip total">25</span></td><td><span class="asset-chip compliant">20</span></td><td><span class="asset-chip risk">5</span></td><td><span class="asset-chip non">0</span></td></tr>
+                <tr><td>Electrical</td><td><span class="asset-chip total">300</span></td><td><span class="asset-chip compliant">260</span></td><td><span class="asset-chip risk">30</span></td><td><span class="asset-chip non">10</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="widget-footer"><a href="#" class="foot-link">View all assets (1157)</a></div>
+      </article>
+    </section>
+
+    <section class="row-grid">
+      <article class="widget h-320" id="widget-budgets">
+        <div class="widget-title">Service charge budgets</div>
+        <div class="widget-body">
+          <div class="budget-summary">
+            <div><strong style="color: var(--blue);">15</strong><span>Budget issued</span></div>
+            <div><strong style="color: var(--amber);">8</strong><span>Budget pending</span></div>
+            <div><strong style="color: var(--red);">5</strong><span>Budget overdue</span></div>
+          </div>
+          <div class="chart-box"><div id="budgetChart" class="echart"></div></div>
+        </div>
+        <div class="widget-footer"><a href="#" class="foot-link">View all service charge budgets (587)</a></div>
+      </article>
+      <div></div>
+    </section>
+
+    <section class="row-grid hidden" id="dynamicWidgetsRow"></section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <script>
+    function unlockWithEmail() {
+      document.body.classList.remove('auth-locked');
+      requestAnimationFrame(() => {
+        if (typeof resizeAllChartsDeferred === 'function') resizeAllChartsDeferred();
+      });
+    }
+
+    function isAllowedEmail(email) {
+      return /^[^\s@]+@aareon\.com$/i.test(email);
+    }
+
+    function initEmailGate() {
+      const form = document.getElementById('emailGateForm');
+      const input = document.getElementById('emailGateInput');
+      const error = document.getElementById('emailGateError');
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        const email = input.value.trim();
+        if (!isAllowedEmail(email)) {
+          error.textContent = 'Incorrect email, please try again.';
+          return;
+        }
+        error.textContent = '';
+        unlockWithEmail();
+      });
+    }
+
+    const models = {
+      all: {
+        current: { kpi: [21, 25, 15], service: [16, 2, 3], contracts: [117, 35, 13], assets: [1187, 35, 3] },
+        next: { kpi: [19, 21, 17], service: [14, 3, 4], contracts: [113, 38, 14], assets: [1187, 37, 5] },
+        next6: { kpi: [43, 52, 24], service: [52, 11, 7], contracts: [108, 42, 15], assets: [1187, 44, 8] }
+      },
+      city: {
+        current: { kpi: [12, 15, 7], service: [9, 1, 2], contracts: [66, 18, 7], assets: [451, 13, 1] },
+        next: { kpi: [11, 13, 8], service: [8, 2, 2], contracts: [64, 19, 8], assets: [451, 14, 2] },
+        next6: { kpi: [27, 31, 12], service: [29, 6, 4], contracts: [59, 25, 9], assets: [451, 19, 3] }
+      },
+      ecb: {
+        current: { kpi: [5, 6, 4], service: [4, 1, 1], contracts: [31, 8, 3], assets: [292, 11, 1] },
+        next: { kpi: [5, 5, 5], service: [3, 2, 1], contracts: [29, 9, 4], assets: [292, 12, 2] },
+        next6: { kpi: [9, 14, 6], service: [12, 4, 2], contracts: [27, 11, 5], assets: [292, 15, 3] }
+      },
+      lol: {
+        current: { kpi: [4, 4, 4], service: [3, 0, 1], contracts: [20, 9, 3], assets: [198, 7, 1] },
+        next: { kpi: [3, 3, 4], service: [3, 0, 1], contracts: [20, 8, 4], assets: [198, 8, 1] },
+        next6: { kpi: [7, 7, 6], service: [11, 1, 1], contracts: [22, 6, 4], assets: [198, 10, 2] }
+      }
+    };
+
+    const portfolioSizeByProperty = {
+      all: 1000,
+      city: 360,
+      ecb: 260,
+      lol: 180
+    };
+    const baseComplianceCategories = [
+      { name: 'FRA', nonCompliant: 30 },
+      { name: 'Gas Safety (CP12)', nonCompliant: 24 },
+      { name: 'Electrical', nonCompliant: 16 },
+      { name: 'Asbestos Assessment', nonCompliant: 9 },
+      { name: 'LOLER', nonCompliant: 0 }
+    ];
+    const lettingsComplianceCategories = [
+      { name: 'Gas Safety CP12', nonCompliant: 30 },
+      { name: 'EICR', nonCompliant: 15 },
+      { name: 'EPC', nonCompliant: 0 }
+    ];
+    const lettingsComplianceDeadlines = [
+      ['EICR', '11 Loddenspark Lane MCL', '2025-06-14', 'past', 'Past'],
+      ['Gas Safety CP12', '11 Loddenspark Lane MCL', '2025-06-14', 'past', 'Past'],
+      ['HMO licence works', 'Heritage House', '2025-06-14', 'approaching', 'Approaching']
+    ];
+    const lettingsComplianceDeadlineSummary = { upcoming: 16, approaching: 3, past: 8 };
+    const lettingsComplianceRisks = [
+      ['11 Loddenspark Lane MCL', 2, 6, 8, '', '25%'],
+      ['15 Bankside Close', 1, 2, 2, '', '50%'],
+      ['39 Heritage House', 5, 3, 4, '', '75%'],
+      ['74 Maple Gardens', 1, 4, 3, '', '50%'],
+      ['19 Daylesford Grove', 0, 3, 1, '', '60%']
+    ];
+
+    const baseBudgets = [
+      ['Budget 1', 62],
+      ['Budget 2', 48],
+      ['Budget 3', 79],
+      ['Budget 4', 69],
+      ['Budget 5', 88]
+    ];
+
+    const baseInspections = [
+      [20, 34, 10], [11, 42, 12], [8, 31, 14], [18, 15, 7], [22, 34, 9],
+      [12, 22, 10], [9, 40, 11], [13, 26, 8], [18, 38, 14], [14, 33, 9]
+    ];
+
+    const baseInspectionPms = [
+      ['PM 1, PM 4', 'PM 1, PM 2, PM 3', 'PM 1, PM 2'],
+      ['PM 2, PM 4', 'PM 2, PM 3', 'PM 1'],
+      ['PM 3', 'PM 1, PM 3', 'PM 2, PM 4'],
+      ['PM 1, PM 2', 'PM 2, PM 4', 'PM 3'],
+      ['PM 4', 'PM 1, PM 2, PM 3', 'PM 1, PM 4'],
+      ['PM 1', 'PM 2, PM 3', 'PM 2'],
+      ['PM 2, PM 3', 'PM 1, PM 4', 'PM 1, PM 3'],
+      ['PM 4', 'PM 1, PM 2', 'PM 2, PM 3'],
+      ['PM 1, PM 3', 'PM 2, PM 4', 'PM 1, PM 2'],
+      ['PM 2', 'PM 1, PM 3, PM 4', 'PM 1, PM 4']
+    ];
+
+    let categories = [...baseComplianceCategories];
+    let budgets = [...baseBudgets];
+    let inspections = [...baseInspections];
+    let inspectionPms = [...baseInspectionPms];
+
+    const aiScenarios = {
+      compliance: {
+        id: 'compliance',
+        label: 'Critical compliance risk review',
+        focusWidgets: ['widget-compliance', 'widget-risk', 'widget-deadlines', 'widget-inspection', 'widget-service', 'widget-issues'],
+        eventTitle: 'Upcoming event: Fire Safety Escalation Meeting',
+        eventDescription: 'Building: Brookfield Mansion | Friday, February 27, 2026 | 9:30 AM to 11:00 AM. Review overdue statutory checks and action owners.',
+        eventBadge: 'Critical',
+        eventAudience: 'Audience: Property managers, compliance leads, FM operations',
+        weights: { kpi: 1.22, service: 1.15, contracts: 1.12, assetsRisk: 1.2 },
+        comments: { unread: 6, read: 8, rows: [['Fire alarm certification missing evidence', 'Landlord', 'NEW'], ['Gas safety certificate expired', 'Contractor', ''], ['Asbestos report upload incomplete', 'Consultant', 'NEW'], ['Emergency lighting test log missing signature', 'Contractor', ''], ['LOLER certificate awaiting approval', 'Landlord', '']] },
+        issues: [['Reported', 8], ['Awaiting instructions', 3], ['Awaiting FM confirmation', 4], ['Job awarded, awaiting equipment date acceptance', 6], ['Remedial issued', 21]],
+        deadlineSummary: { upcoming: 16, approaching: 3, past: 8 },
+        deadlineFooter: 'View all blocks (260)',
+        deadlines: [
+          ['EICR', 'Center Block', '2025-06-14', 'past', 'Past'],
+          ['Gas Safety CP12', 'Block North', '2025-06-14', 'past', 'Past'],
+          ['LOLER inspection', 'Heritage House', '2025-06-14', 'approaching', 'Approaching'],
+          ['Fire alarm servicing', 'South Tower', '2025-06-16', 'upcoming', 'Upcoming'],
+          ['Emergency lighting test', 'Docklands', '2025-06-17', 'upcoming', 'Upcoming']
+        ],
+        risks: [['Brookfield Mansion', 11, 4, 7, 'p-red', '98%'], ['Ten Benefits Estate', 5, 8, 6, 'p-red', '92%'], ['Surrey Heights', 3, 4, 2, 'p-amber', '76%'], ['Elm Grove', 2, 3, 2, 'p-amber', '71%'], ['The Aspire', 2, 2, 3, 'p-amber', '66%'], ['ECB Tower A', 1, 2, 2, 'p-green', '45%']],
+        services: [['Emergency lighting', 'Feb 2026-02-28', 'p-red', '4'], ['FRA', 'Mar 2026-03-04', 'p-amber', '3'], ['Water hygiene', 'Mar 2026-03-07', 'p-amber', '2'], ['Gas safety (CP12)', 'Mar 2026-03-08', 'p-red', '4'], ['Asbestos reassessment', 'Mar 2026-03-11', 'p-amber', '2'], ['LOLER', 'Mar 2026-03-12', 'p-blue', '1']]
+      },
+      overdue: {
+        id: 'overdue',
+        label: 'Overdue events and PM escalations',
+        focusWidgets: ['widget-issues', 'widget-deadlines', 'widget-risk', 'widget-service', 'widget-inspection', 'widget-comments'],
+        eventTitle: 'Upcoming event: PM Escalation Board',
+        eventDescription: 'Portfolio: Multi-site | Thursday, February 26, 2026 | 2:00 PM to 3:30 PM. Review all overdue operations events by property manager.',
+        eventBadge: 'Action needed',
+        eventAudience: 'Audience: Regional PMs and escalation desk',
+        weights: { kpi: 1.3, service: 1.34, contracts: 1.06, assetsRisk: 1.1 },
+        comments: { unread: 9, read: 4, rows: [['Escalation requested for lift maintenance', 'Landlord', 'NEW'], ['Overdue due-date accepted without evidence', 'Contractor', 'NEW'], ['FRA follow-up note pending PM sign-off', 'Landlord', ''], ['Emergency light test missed for Block C', 'Contractor', 'NEW'], ['Water hygiene update overdue from vendor', 'Contractor', '']] },
+        issues: [['Reported', 11], ['Awaiting instructions', 5], ['Awaiting FM confirmation', 3], ['Job awarded, awaiting equipment date acceptance', 9], ['Remedial issued', 26]],
+        deadlines: [['Sales City (PIC)', 'Feb 2026-02-25', 'p-red', '9'], ['ECB', 'Feb 2026-02-27', 'p-amber', '5'], ['LOLB inspection', 'Mar 2026-03-01', 'p-amber', '4'], ['Brookfield Mansion', 'Mar 2026-03-02', 'p-red', '7'], ['Elm Grove', 'Mar 2026-03-04', 'p-amber', '3'], ['Surrey Heights', 'Mar 2026-03-05', 'p-blue', '1']],
+        risks: [['Ten Benefits Estate', 7, 9, 7, 'p-red', '94%'], ['Brookfield Mansion', 9, 5, 6, 'p-red', '91%'], ['Elm Grove', 3, 6, 4, 'p-amber', '74%'], ['The Aspire', 2, 5, 4, 'p-amber', '69%'], ['ECB Tower A', 2, 4, 3, 'p-amber', '63%'], ['LOLB House', 1, 3, 2, 'p-green', '47%']],
+        services: [['Lift maintenance', 'Feb 2026-02-24', 'p-red', '5'], ['FRA', 'Feb 2026-02-26', 'p-red', '3'], ['DSR', 'Mar 2026-03-02', 'p-amber', '2'], ['Emergency lighting', 'Mar 2026-03-03', 'p-red', '4'], ['Gas safety (CP12)', 'Mar 2026-03-05', 'p-amber', '2'], ['LOLER', 'Mar 2026-03-06', 'p-blue', '1']]
+      },
+      budget: {
+        id: 'budget',
+        label: 'Budget pressure and overspend overview',
+        focusWidgets: ['widget-budgets', 'widget-contracts', 'widget-assets', 'widget-service', 'widget-deadlines'],
+        eventTitle: 'Upcoming event: Service Charge Forecast Review',
+        eventDescription: 'Portfolio finance sync | Monday, March 2, 2026 | 1:00 PM to 2:00 PM. Validate high-cost contracts and mitigation actions.',
+        eventBadge: 'Financial focus',
+        eventAudience: 'Audience: Asset managers, PM finance owners',
+        weights: { kpi: 0.95, service: 1.08, contracts: 1.28, assetsRisk: 1.15 },
+        comments: { unread: 4, read: 10, rows: [['Budget variance commentary requested', 'Landlord', 'NEW'], ['Ground maintenance quote exceeded baseline', 'Contractor', ''], ['Vendor requested uplift due to inflation clause', 'Contractor', ''], ['Service charge cap review requested by PM', 'Landlord', 'NEW'], ['Waste disposal recurring fee anomaly flagged', 'Finance', '']] },
+        issues: [['Reported', 4], ['Awaiting instructions', 3], ['Awaiting FM confirmation', 2], ['Job awarded, awaiting equipment date acceptance', 8], ['Remedial issued', 11]],
+        deadlines: [['ECB', 'Mar 2026-03-10', 'p-blue', '2'], ['Surrey Heights', 'Mar 2026-03-11', 'p-amber', '3'], ['Ten Benefits Estate', 'Mar 2026-03-09', 'p-red', '6'], ['The Aspire', 'Mar 2026-03-12', 'p-amber', '4'], ['Elm Grove', 'Mar 2026-03-13', 'p-blue', '2'], ['LOLB House', 'Mar 2026-03-15', 'p-amber', '3']],
+        risks: [['Ten Benefits Estate', 6, 5, 7, 'p-red', '90%'], ['The Aspire', 3, 4, 5, 'p-amber', '68%'], ['Elm Grove', 1, 3, 3, 'p-green', '39%'], ['Brookfield Mansion', 4, 3, 4, 'p-amber', '64%'], ['Sales City (PIC)', 2, 2, 3, 'p-amber', '59%'], ['ECB Tower A', 1, 1, 2, 'p-green', '34%']],
+        services: [['Cleaning contract', 'Mar 2026-03-08', 'p-amber', '3'], ['Ground maintenance', 'Mar 2026-03-05', 'p-red', '4'], ['Waste disposal', 'Mar 2026-03-12', 'p-amber', '2'], ['Fire equipment servicing', 'Mar 2026-03-13', 'p-amber', '3'], ['Lift maintenance', 'Mar 2026-03-15', 'p-red', '4'], ['HVAC servicing', 'Mar 2026-03-16', 'p-blue', '1']]
+      },
+      readiness: {
+        id: 'readiness',
+        label: 'Preventive maintenance readiness',
+        focusWidgets: ['widget-inspection', 'widget-trend', 'widget-contracts', 'widget-compliance', 'widget-service'],
+        eventTitle: 'Upcoming event: Preventive Readiness Checkpoint',
+        eventDescription: 'Quarter kickoff | Tuesday, March 3, 2026 | 11:00 AM to 12:00 PM. Validate scheduling readiness for statutory tasks.',
+        eventBadge: 'Planning',
+        eventAudience: 'Audience: PMs, planners, operations team',
+        weights: { kpi: 0.9, service: 0.88, contracts: 1.05, assetsRisk: 0.95 },
+        comments: { unread: 3, read: 11, rows: [['Q2 readiness plan uploaded for review', 'Landlord', 'NEW'], ['Preventive checks sequencing confirmed', 'Contractor', ''], ['Contractor slot allocation approved', 'Planner', ''], ['Resident notice templates finalized', 'PMO', ''], ['Spare parts list validated for Q2', 'Stores', '']] },
+        issues: [['Reported', 3], ['Awaiting instructions', 1], ['Awaiting FM confirmation', 1], ['Job awarded, awaiting equipment date acceptance', 4], ['Remedial issued', 8]],
+        deadlines: [['ECB', 'Apr 2026-04-02', 'p-blue', '2'], ['Sales City (PIC)', 'Apr 2026-04-04', 'p-amber', '3'], ['LOLB inspection', 'Apr 2026-04-07', 'p-blue', '1'], ['Brookfield Mansion', 'Apr 2026-04-08', 'p-amber', '2'], ['Elm Grove', 'Apr 2026-04-10', 'p-blue', '1'], ['Surrey Heights', 'Apr 2026-04-11', 'p-blue', '1']],
+        risks: [['Brookfield Mansion', 4, 2, 4, 'p-amber', '66%'], ['The Aspire', 2, 2, 3, 'p-amber', '58%'], ['Surrey Heights', 1, 1, 2, 'p-green', '31%'], ['ECB Tower A', 1, 1, 2, 'p-green', '29%'], ['Sales City (PIC)', 1, 1, 1, 'p-green', '27%'], ['Ten Benefits Estate', 2, 1, 2, 'p-amber', '52%']],
+        services: [['FRA', 'Apr 2026-04-06', 'p-blue', '1'], ['DSR', 'Apr 2026-04-08', 'p-blue', '1'], ['Water hygiene', 'Apr 2026-04-09', 'p-amber', '2'], ['Emergency lighting', 'Apr 2026-04-11', 'p-blue', '1'], ['Gas safety (CP12)', 'Apr 2026-04-13', 'p-blue', '1'], ['LOLER', 'Apr 2026-04-15', 'p-amber', '2']]
+      }
+    };
+
+    let property = 'all';
+    let month = 'current';
+    let selectedUser = 'me';
+    let customerType = 'block';
+    let customRange = { from: null, to: null };
+    let activeScenario = aiScenarios.readiness;
+    let activePersona = 'property_manager';
+    let lastAiPrompt = '';
+    let activeChipPrompt = '';
+    let activeDynamicWidgetIds = [];
+    let dynamicCharts = [];
+
+    const allWidgetIds = [
+      'widget-comments', 'widget-issues', 'widget-compliance', 'widget-deadlines',
+      'widget-risk', 'widget-service', 'widget-inspection', 'widget-trend',
+      'widget-contracts', 'widget-assets', 'widget-budgets'
+    ];
+
+    const userScale = {
+      me: 1,
+      alex: 1.08,
+      jamie: 0.93,
+      sam: 1.15
+    };
+
+    const defaultPersonaByUser = {
+      me: 'property_manager',
+      alex: 'director',
+      jamie: 'compliance_manager',
+      sam: 'block_director'
+    };
+    const defaultPersonaByUserLettings = {
+      me: 'property_manager',
+      alex: 'property_manager',
+      jamie: 'compliance_manager',
+      sam: 'tenant'
+    };
+
+    const promptChipSets = {
+      block: [
+        { label: 'Compliance manager risk view', prompt: 'As a compliance manager, show statutory compliance risk and overdue actions for the next 30 days.' },
+        { label: 'Block director decision view', prompt: 'As a block director, show quotes awaiting decision, budget pressure and urgent building issues.' },
+        { label: 'Leaseholder view', prompt: 'As a leaseholder, show important building updates, documents and decisions relevant to my block.' },
+        { label: 'Property manager operations view', prompt: 'As a property manager, show maintenance schedule, inspections and resident request workload.' }
+      ],
+      lettings: [
+        { label: 'Compliance manager risk view', prompt: 'As a compliance manager, show statutory compliance risk and overdue actions for the next 30 days.' },
+        { label: 'Portfolio operations view', prompt: 'As a portfolio lead, show urgent operational risks and items needing action.' },
+        { label: "Tenant's view", prompt: 'As a tenant, show my requests, comments and important building notifications.' },
+        { label: 'Property manager operations view', prompt: 'As a property manager, show maintenance schedule, inspections and resident request workload.' }
+      ]
+    };
+
+    const personaProfiles = {
+      senior_property_manager: {
+        label: 'Senior property manager',
+        baseWidgets: ['widget-comments', 'widget-issues', 'widget-deadlines', 'widget-risk', 'widget-service', 'widget-inspection', 'widget-trend', 'widget-contracts'],
+        dynamicWidgets: ['team-performance', 'team-allocation', 'maintenance-schedule', 'building-issues']
+      },
+      compliance_manager: {
+        label: 'Compliance manager',
+        baseWidgets: ['widget-compliance', 'widget-deadlines', 'widget-risk', 'widget-inspection', 'widget-trend', 'widget-service', 'widget-assets', 'widget-issues'],
+        dynamicWidgets: ['document-centre', 'service-agreements', 'overall-compliance-rate', 'building-notifications']
+      },
+      property_manager: {
+        label: 'Property manager',
+        baseWidgets: ['widget-comments', 'widget-issues', 'widget-deadlines', 'widget-risk', 'widget-service', 'widget-inspection', 'widget-contracts'],
+        dynamicWidgets: ['maintenance-schedule', 'resident-requests', 'building-issues', 'document-centre']
+      },
+      block_director: {
+        label: 'Block director',
+        baseWidgets: ['widget-budgets', 'widget-deadlines', 'widget-risk', 'widget-assets', 'widget-comments', 'widget-issues'],
+        dynamicWidgets: ['quote-tracker', 'building-issues', 'building-notifications', 'document-centre']
+      },
+      director: {
+        label: 'Director',
+        baseWidgets: ['widget-trend', 'widget-assets', 'widget-budgets', 'widget-risk', 'widget-contracts', 'widget-deadlines', 'widget-issues'],
+        dynamicWidgets: ['quote-tracker', 'overall-compliance-rate', 'document-centre', 'building-notifications']
+      },
+      leaseholder: {
+        label: 'Leaseholder',
+        baseWidgets: ['widget-comments', 'widget-budgets', 'widget-deadlines', 'widget-service', 'widget-assets'],
+        dynamicWidgets: ['quote-tracker', 'document-centre', 'service-agreements', 'maintenance-schedule']
+      },
+      landlord: {
+        label: 'Landlord',
+        baseWidgets: ['widget-comments', 'widget-issues', 'widget-budgets', 'widget-deadlines', 'widget-risk', 'widget-assets'],
+        dynamicWidgets: ['quote-tracker', 'document-centre', 'service-agreements', 'building-notifications']
+      },
+      tenant: {
+        label: 'Tenant',
+        baseWidgets: ['widget-comments', 'widget-deadlines'],
+        dynamicWidgets: ['resident-requests', 'building-notifications', 'maintenance-schedule', 'new-request-actions']
+      }
+    };
+
+    const blockComplianceWidgetSet = [
+      'widget-service',
+      'widget-contracts',
+      'widget-assets',
+      'widget-inspection',
+      'widget-trend',
+      'widget-risk',
+      'widget-deadlines',
+      'widget-comments',
+      'widget-budgets',
+      'widget-issues',
+      'widget-compliance'
+    ];
+
+    const lettingsComplianceWidgetSet = [
+      'widget-comments',
+      'widget-issues',
+      'widget-compliance',
+      'widget-deadlines',
+      'widget-risk',
+      'widget-service',
+      'widget-inspection',
+      'widget-trend'
+    ];
+
+    const personaKpiProfiles = {
+      senior_property_manager: { titles: ['Team open workload', 'Team overdue actions', 'This week team visits'] },
+      compliance_manager: { titles: ['Upcoming compliance actions', 'Overdue statutory actions', 'Critical risk items'] },
+      property_manager: { titles: ['Open work orders', 'Overdue tasks', 'Visits due this week'] },
+      block_director: { titles: ['Items awaiting decision', 'High-impact issues', 'Budget risk items'] },
+      director: { titles: ['Portfolio risk items', 'Decisions required', 'Sites off track'] },
+      leaseholder: { titles: ['Building updates', 'Open decisions', 'Upcoming impactful works'] },
+      landlord: { titles: ['Properties needing action', 'Quotes awaiting approval', 'Urgent issues'] },
+      tenant: { titles: ['My open requests', 'Awaiting update', 'Upcoming works affecting me'] }
+    };
+
+    const dynamicWidgetCatalog = {
+      'maintenance-schedule': {
+        title: 'Maintenance Schedule',
+        cta: 'View all schedules (8)',
+        kpis: [{ value: '1', label: 'Urgent', color: 'var(--red)' }, { value: '2', label: 'Confirmed', color: 'var(--green)' }, { value: '4', label: 'This week', color: 'var(--blue)' }],
+        style: 'reference',
+        rows: [
+          { title: 'Elevator monthly inspection', sub: 'Elevator Solutions Ltd · Main Building', middle: '2025-06-28', statusClass: 'confirmed', statusLabel: 'Confirmed' },
+          { title: 'Garden maintenance', sub: 'Green Spaces Co · External Grounds', middle: '2025-06-28', statusClass: 'pending', statusLabel: 'Pending' },
+          { title: 'Fire door checks', sub: 'SafeDoor Services · Block B', middle: '2025-06-29', statusClass: 'in-progress', statusLabel: 'In progress' }
+        ]
+      },
+      'quote-tracker': {
+        title: 'Quote Tracker',
+        cta: 'View all quotes (12)',
+        kpis: [{ value: '3', label: 'Urgent', color: 'var(--red)' }, { value: '2', label: 'Need decision', color: 'var(--red)' }, { value: '1', label: 'In progress', color: 'var(--blue)' }],
+        headers: ['Quote', 'Amount', ''],
+        rows: [
+          ['Roof Repair - Block A<div class="text-muted small">Premium Roofing Ltd</div>', '£15,750', '<span class="pill p-red">Vote needed</span>'],
+          ['Car Park Resurfacing<div class="text-muted small">SurfacePro</div>', '£22,500', '<span class="pill p-red">Vote needed</span>'],
+          ['Balcony railing replacement<div class="text-muted small">Urban Metalworks</div>', '£9,600', '<span class="pill p-amber">Awaiting review</span>']
+        ],
+        chart: { type: 'bar', labels: ['Urgent', 'Need decision', 'In progress'], values: [3, 2, 1], color: '#d94c61' }
+      },
+      'document-centre': {
+        title: 'Document centre',
+        cta: 'View all documents (34)',
+        kpis: [{ value: '3', label: 'Need review', color: 'var(--red)' }, { value: '2', label: 'New this week', color: 'var(--blue)' }, { value: '34', label: 'Total docs', color: '#1f252b' }],
+        style: 'reference',
+        rows: [
+          { title: 'Q3 Financial Report', sub: 'Financial · Finance Team · 2.4 MB', middle: '2025-06-15', statusClass: 'new', statusLabel: 'New' },
+          { title: 'Insurance Policy Renewal', sub: 'Legal · Property Manager · 1.8 MB', middle: '2025-06-15', statusClass: 'review-needed', statusLabel: 'Review needed' },
+          { title: 'Fire strategy update', sub: 'Compliance · H&S Team · 3.1 MB', middle: '2025-06-13', statusClass: 'pending', statusLabel: 'Pending' }
+        ]
+      },
+      'resident-requests': {
+        title: 'Resident Requests',
+        cta: 'View all requests (14)',
+        kpis: [{ value: '1', label: 'Urgent', color: 'var(--red)' }, { value: '2', label: 'Pending', color: '#1f252b' }, { value: '1', label: 'In progress', color: 'var(--blue)' }],
+        style: 'reference',
+        rows: [
+          { title: 'Noisy neighbour complaint', sub: 'Apt 4B · Sarah Johnson', middle: '2025-06-24', statusClass: 'in-progress', statusLabel: 'In progress' },
+          { title: 'Parking space dispute', sub: 'Apt 2A · Mike Wilson', middle: '2025-06-14', statusClass: 'pending', statusLabel: 'Pending' },
+          { title: 'Heating issue', sub: 'Apt 6C · Emma Ray', middle: '2025-06-13', statusClass: 'urgent', statusLabel: 'Urgent' }
+        ]
+      },
+      'building-notifications': {
+        title: 'Building notifications',
+        cta: 'View all notifications (9)',
+        kpis: [{ value: '2', label: 'High importance', color: 'var(--red)' }, { value: '1', label: 'Today', color: 'var(--blue)' }, { value: '9', label: 'Total', color: '#1f252b' }],
+        headers: ['Notification', 'When', ''],
+        rows: [
+          ['Security system update<div class="text-muted small">New entry codes will be active from tonight</div>', '3 hours ago', '<span class="pill p-red">High</span>'],
+          ['Compliance deadline<div class="text-muted small">Fire safety certificate renewal due in 3 days</div>', '1 day ago', '<span class="pill p-red">High</span>'],
+          ['Water shutdown notice<div class="text-muted small">Planned works Saturday 08:00-11:00</div>', '2 days ago', '<span class="pill p-blue">Info</span>']
+        ],
+        chart: { type: 'bar', labels: ['High', 'Info', 'Updates'], values: [2, 4, 3], color: '#ff9f1c' }
+      },
+      'service-agreements': {
+        title: 'Service agreements',
+        cta: 'View all service agreements (2186)',
+        kpis: [{ value: '1187', label: 'Active', color: 'var(--green)' }, { value: '35', label: 'Expiring soon', color: 'var(--amber)' }, { value: '13', label: 'Published', color: 'var(--blue)' }],
+        headers: ['Agreement', 'Date', ''],
+        rows: [
+          ['021-Mews-Fire Assets<div class="text-muted small">Dawn Fire & Security Ltd</div>', 'Ending: 2026-03-14', '<span class="pill p-amber">Expiring soon</span>'],
+          ['144-17 Ford Ave-Fire Assets<div class="text-muted small">Millar Fire & Safety</div>', 'Ending: 2026-03-14', '<span class="pill p-amber">Expiring soon</span>'],
+          ['147-Grove Road-Fire Assets<div class="text-muted small">Fire Guard Ltd</div>', 'Ending: 2026-03-20', '<span class="pill p-blue">Published</span>']
+        ],
+        chart: { type: 'line', labels: ['Jan', 'Feb', 'Mar', 'Apr'], values: [1200, 1193, 1187, 1182], color: '#2f9c5d' }
+      },
+      'building-issues': {
+        title: 'Building Issues',
+        cta: 'View all issues (24)',
+        kpis: [{ value: '3', label: 'Awaiting approval', color: 'var(--amber)' }, { value: '2', label: 'Total active', color: 'var(--blue)' }, { value: '1', label: 'Urgent', color: 'var(--red)' }],
+        style: 'reference',
+        rows: [
+          { title: 'Water leak in basement', sub: 'Plumbing · Resident 4A', middle: '2025-06-14', statusClass: 'awaiting-approval', statusLabel: 'Awaiting approval' },
+          { title: 'Roof Repair - Block A', sub: 'Structural · Building Surveyor', middle: '2025-06-14', statusClass: 'urgent', statusLabel: 'Urgent' },
+          { title: 'Lift sensor error', sub: 'Mechanical · Lift vendor', middle: '2025-06-12', statusClass: 'in-progress', statusLabel: 'In progress' }
+        ]
+      },
+      'overall-compliance-rate': {
+        title: 'Overall Compliance Rate',
+        cta: 'View full compliance summary',
+        kpis: [{ value: '82%', label: 'Current', color: 'var(--green)' }, { value: '-3%', label: 'MoM', color: 'var(--red)' }, { value: '1187', label: 'Assessed', color: 'var(--blue)' }],
+        headers: ['Workstream', 'Rate', ''],
+        rows: [
+          ['Fire safety controls', '91%', '<span class="pill p-green">Healthy</span>'],
+          ['Electrical inspections', '78%', '<span class="pill p-amber">Watch</span>'],
+          ['Water hygiene', '69%', '<span class="pill p-red">Action needed</span>']
+        ],
+        chart: { type: 'line', labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], values: [86, 84, 83, 85, 82, 82], color: '#2f9c5d' }
+      },
+      'team-performance': {
+        title: 'Team Performance',
+        cta: 'View team performance details',
+        kpis: [{ value: '89%', label: 'SLA hit rate', color: 'var(--green)' }, { value: '24h', label: 'Avg first response', color: 'var(--blue)' }, { value: '7', label: 'Escalations', color: 'var(--red)' }],
+        headers: ['PM', 'Completion', ''],
+        rows: [
+          ['PM Alex Morgan<div class="text-muted small">North cluster</div>', '93%', '<span class="pill p-green">Top</span>'],
+          ['PM Sam Lee<div class="text-muted small">Central cluster</div>', '88%', '<span class="pill p-blue">On target</span>'],
+          ['PM Jamie Patel<div class="text-muted small">South cluster</div>', '81%', '<span class="pill p-amber">Watch</span>']
+        ],
+        chart: { type: 'line', labels: ['W1', 'W2', 'W3', 'W4'], values: [84, 87, 89, 89], color: '#2f9c5d' }
+      },
+      'team-allocation': {
+        title: 'Team Allocation',
+        cta: 'View allocation board',
+        kpis: [{ value: '64%', label: 'Planned capacity', color: 'var(--blue)' }, { value: '22%', label: 'High-risk load', color: 'var(--amber)' }, { value: '14%', label: 'Available capacity', color: 'var(--green)' }],
+        headers: ['PM', 'Assigned sites', ''],
+        rows: [
+          ['PM Alex Morgan<div class="text-muted small">Fire, lifts, statutory checks</div>', '18', '<span class="pill p-amber">Near limit</span>'],
+          ['PM Sam Lee<div class="text-muted small">Resident issues, repairs</div>', '14', '<span class="pill p-blue">Balanced</span>'],
+          ['PM Jamie Patel<div class="text-muted small">Compliance backlog reduction</div>', '11', '<span class="pill p-green">Capacity</span>']
+        ],
+        chart: { type: 'bar', labels: ['Alex', 'Sam', 'Jamie'], values: [18, 14, 11], color: '#169fdd' }
+      },
+      'new-request-actions': {
+        title: 'New Request Actions',
+        cta: 'Create new request',
+        kpis: [{ value: '2', label: 'Open', color: 'var(--blue)' }, { value: '1', label: 'Awaiting visit', color: 'var(--amber)' }, { value: '0', label: 'Urgent', color: 'var(--red)' }],
+        headers: ['Action', 'Status', ''],
+        rows: [
+          ['Report a new issue<div class="text-muted small">Create a repair request with photos</div>', 'Ready', '<span class="pill p-blue">Start</span>'],
+          ['Track my latest request<div class="text-muted small">View updates and contractor ETA</div>', 'In progress', '<span class="pill p-amber">View</span>'],
+          ['Manage access notes<div class="text-muted small">Update access instructions for visits</div>', 'Available', '<span class="pill p-green">Update</span>']
+        ],
+        chart: { type: 'bar', labels: ['Open', 'Awaiting visit', 'Urgent'], values: [2, 1, 0], color: '#169fdd' }
+      }
+    };
+
+    const categoryChart = echarts.init(document.getElementById('categoryChart'));
+    const inspectionChart = echarts.init(document.getElementById('inspectionChart'));
+    const trendChart = echarts.init(document.getElementById('trendChart'));
+    const budgetChart = echarts.init(document.getElementById('budgetChart'));
+    let activeTooltips = [];
+
+    function initUiTooltips() {
+      if (!window.bootstrap || !window.bootstrap.Tooltip) return;
+      activeTooltips.forEach(t => t.dispose());
+      activeTooltips = [...document.querySelectorAll('[data-bs-toggle="tooltip"]')]
+        .map(el => new window.bootstrap.Tooltip(el, {
+          container: 'body',
+          trigger: 'hover focus',
+          placement: 'top',
+          boundary: 'viewport'
+        }));
+    }
+
+    function addUserChatMessage(text) {
+      const thread = document.getElementById('chatThread');
+      if (!thread) return;
+      const row = document.createElement('div');
+      row.className = 'chat-msg user';
+      row.innerHTML = `<div class="chat-bubble">${text}</div>`;
+      thread.appendChild(row);
+      thread.scrollTop = thread.scrollHeight;
+    }
+
+    function updateChatEmptyState() {
+      const empty = document.getElementById('chatEmpty');
+      const thread = document.getElementById('chatThread');
+      if (!empty || !thread) return;
+      const hasRealMessages = [...thread.children].some(el => !el.classList.contains('chat-empty'));
+      empty.classList.toggle('hidden', hasRealMessages);
+    }
+
+    function getChartImageForWidget(widgetId) {
+      try {
+        if (widgetId === 'widget-compliance') return categoryChart.getDataURL({ pixelRatio: 2, backgroundColor: '#ffffff' });
+        if (widgetId === 'widget-inspection') return inspectionChart.getDataURL({ pixelRatio: 2, backgroundColor: '#ffffff' });
+        if (widgetId === 'widget-trend') return trendChart.getDataURL({ pixelRatio: 2, backgroundColor: '#ffffff' });
+        if (widgetId === 'widget-budgets') return budgetChart.getDataURL({ pixelRatio: 2, backgroundColor: '#ffffff' });
+      } catch (e) {
+        return '';
+      }
+      return '';
+    }
+
+    function createWidgetCloneForChat(widget) {
+      const clone = widget.cloneNode(true);
+      clone.classList.add('chat-widget-card');
+      if (widget.id) clone.classList.add(`chat-widget-${widget.id.replace('widget-', '')}`);
+      if (widget.id === 'widget-issues') clone.classList.add('chat-issues-spread');
+      if (widget.id === 'widget-risk') {
+        clone.classList.add('chat-risk-spread');
+        const riskRows = clone.querySelectorAll('tbody tr').length;
+        clone.style.setProperty('--risk-rows', String(Math.max(1, riskRows)));
+      }
+      clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+      clone.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+        el.removeAttribute('aria-describedby');
+        el.classList.remove('show');
+      });
+      clone.querySelectorAll('.echart').forEach(el => {
+        el.removeAttribute('_echarts_instance_');
+        el.innerHTML = '';
+      });
+      const hasChart = Boolean(clone.querySelector('.echart'));
+      const listRowCount = clone.querySelectorAll('.comment-row, .deadline-row, .service-row, .contract-row, .dynamic-row, .issue-row').length;
+      const tableRowCount = clone.querySelectorAll('.table tbody tr').length;
+      const contentRowCount = listRowCount + tableRowCount;
+      clone.dataset.contentRows = String(contentRowCount);
+      clone.dataset.hasChart = hasChart ? '1' : '0';
+      if (hasChart || contentRowCount <= 4) {
+        clone.classList.add('chat-full-width');
+      }
+      if (!hasChart && contentRowCount > 0 && contentRowCount <= 6) {
+        clone.classList.add('chat-spread');
+      }
+      if (hasChart && contentRowCount <= 1) {
+        clone.classList.add('chat-single-row');
+      }
+      return clone;
+    }
+
+    function getGridColumnCount(grid) {
+      const tpl = getComputedStyle(grid).gridTemplateColumns;
+      if (!tpl || tpl === 'none') return 1;
+      return tpl.split(' ').filter(Boolean).length || 1;
+    }
+
+    function getWidgetDensityScore(widget) {
+      const rows = Number(widget.dataset.contentRows || '0');
+      const hasChart = widget.dataset.hasChart === '1';
+      return rows + (hasChart ? 3 : 0);
+    }
+
+    function applyRowWidthBalancing(grid) {
+      const cards = [...grid.querySelectorAll('.chat-widget-card')];
+      cards.forEach(card => {
+        card.classList.remove('chat-two-up');
+        card.classList.remove('chat-one-up');
+      });
+      const rowMap = new Map();
+      cards.forEach(card => {
+        if (card.classList.contains('chat-full-width')) return;
+        const top = Math.round(card.offsetTop);
+        if (!rowMap.has(top)) rowMap.set(top, []);
+        rowMap.get(top).push(card);
+      });
+      rowMap.forEach(rowCards => {
+        if (rowCards.length === 1) {
+          rowCards[0].classList.add('chat-one-up');
+          return;
+        }
+        if (rowCards.length === 2) {
+          rowCards.forEach(card => card.classList.add('chat-two-up'));
+        }
+      });
+    }
+
+    function balanceSparseWidgetsInRows(grid) {
+      const colCount = getGridColumnCount(grid);
+      const cards = [...grid.querySelectorAll('.chat-widget-card')];
+      cards.forEach(card => card.classList.remove('chat-row-spread'));
+      if (colCount < 2) return;
+
+      let row = [];
+      cards.forEach(card => {
+        const isFull = card.classList.contains('chat-full-width');
+        if (isFull) {
+          if (row.length > 1) {
+            const scores = row.map(getWidgetDensityScore);
+            const maxScore = Math.max(...scores);
+            row.forEach((item, idx) => {
+              if (scores[idx] <= maxScore - 2) item.classList.add('chat-row-spread');
+            });
+          }
+          row = [];
+          return;
+        }
+        row.push(card);
+        if (row.length === colCount) {
+          const scores = row.map(getWidgetDensityScore);
+          const maxScore = Math.max(...scores);
+          row.forEach((item, idx) => {
+            if (scores[idx] <= maxScore - 2) item.classList.add('chat-row-spread');
+          });
+          row = [];
+        }
+      });
+      if (row.length > 1) {
+        const scores = row.map(getWidgetDensityScore);
+        const maxScore = Math.max(...scores);
+        row.forEach((item, idx) => {
+          if (scores[idx] <= maxScore - 2) item.classList.add('chat-row-spread');
+        });
+      }
+    }
+
+    function hydrateChatWidgetCharts(sourceWidget, cloneWidget) {
+      const sourceCharts = [...sourceWidget.querySelectorAll('.echart')];
+      const targetCharts = [...cloneWidget.querySelectorAll('.echart')];
+      targetCharts.forEach((targetHost, idx) => {
+        const sourceHost = sourceCharts[idx];
+        if (!sourceHost) return;
+        const sourceInstance = echarts.getInstanceByDom(sourceHost);
+        if (!sourceInstance) return;
+        const option = sourceInstance.getOption();
+        if (!option) return;
+        requestAnimationFrame(() => {
+          const targetInstance = echarts.init(targetHost);
+          targetInstance.setOption(option, true);
+          targetInstance.resize();
+        });
+      });
+    }
+
+    async function addAssistantWidgetResponse(promptText) {
+      const thread = document.getElementById('chatThread');
+      if (!thread) return;
+      resizeAllCharts();
+      const sourceGrid = document.getElementById('widgetsGrid') || document.getElementById('dynamicWidgetsRow');
+      if (!sourceGrid) return;
+
+      const visibleWidgets = [...sourceGrid.querySelectorAll('.widget')].filter(el => !el.classList.contains('hidden'));
+      const response = document.createElement('div');
+      response.className = 'chat-msg';
+      const container = document.createElement('div');
+      container.className = 'chat-response';
+
+      const head = document.createElement('div');
+      head.className = 'chat-response-head';
+      head.textContent = `Dashboard response for: ${promptText}`;
+      container.appendChild(head);
+
+      const grid = document.createElement('div');
+      grid.className = 'chat-widget-grid';
+      container.appendChild(grid);
+
+      response.appendChild(container);
+      thread.appendChild(response);
+      thread.scrollTop = thread.scrollHeight;
+      for (const widget of visibleWidgets) {
+        const clone = createWidgetCloneForChat(widget);
+        grid.appendChild(clone);
+        hydrateChatWidgetCharts(widget, clone);
+        balanceSparseWidgetsInRows(grid);
+        applyRowWidthBalancing(grid);
+        initUiTooltips();
+        thread.scrollTop = thread.scrollHeight;
+        await new Promise(resolve => setTimeout(resolve, 380));
+      }
+      balanceSparseWidgetsInRows(grid);
+      applyRowWidthBalancing(grid);
+      initUiTooltips();
+      updateChatEmptyState();
+      thread.scrollTop = thread.scrollHeight;
+    }
+
+    function addLoadingIndicator() {
+      const thread = document.getElementById('chatThread');
+      if (!thread) return null;
+      const row = document.createElement('div');
+      row.className = 'chat-msg';
+      row.innerHTML = `
+        <div class="chat-loading" aria-live="polite" aria-label="Generating dashboard">
+          Building dashboard
+          <span class="chat-loading-dots"><span></span><span></span><span></span></span>
+        </div>
+      `;
+      thread.appendChild(row);
+      thread.scrollTop = thread.scrollHeight;
+      return row;
+    }
+
+    function renderRows(targetId, rows, mapFn) {
+      const host = document.getElementById(targetId);
+      host.innerHTML = rows.map(mapFn).join('');
+    }
+
+
+    function mapDeadlineClassToStatus(pillClass = '') {
+      if (pillClass === 'p-red') return { key: 'past', label: 'Past' };
+      if (pillClass === 'p-amber') return { key: 'approaching', label: 'Approaching' };
+      return { key: 'upcoming', label: 'Upcoming' };
+    }
+
+    function normalizeDeadlineRow(row) {
+      if (row.length >= 5) {
+        return { title: row[0], sub: row[1], due: row[2], key: row[3], label: row[4] };
+      }
+      const [title, due, pillClass] = row;
+      const status = mapDeadlineClassToStatus(pillClass);
+      return {
+        title,
+        sub: customerType === 'lettings' ? 'Lettings portfolio' : 'Block portfolio',
+        due,
+        key: status.key,
+        label: status.label
+      };
+    }
+
+    function deriveDeadlineSummary(rows) {
+      return rows.reduce((acc, row) => {
+        if (row.length >= 5) {
+          acc[row[3]] += 1;
+          return acc;
+        }
+        const [, , pillClass, val] = row;
+        const status = mapDeadlineClassToStatus(pillClass);
+        const n = Number(val);
+        acc[status.key] += Number.isFinite(n) ? n : 1;
+        return acc;
+      }, { upcoming: 0, approaching: 0, past: 0 });
+    }
+
+    function mapServiceClassToStatus(pillClass = '') {
+      if (pillClass === 'p-red') return { key: 'non-compliant', label: 'Non-compliant' };
+      if (pillClass === 'p-amber') return { key: 'due-soon', label: 'Due soon' };
+      return { key: 'compliant', label: 'Compliant' };
+    }
+
+    function normalizeServiceRow(row) {
+      if (row.length >= 5) {
+        return { title: row[0], sub: row[1], next: row[2], key: row[3], label: row[4] };
+      }
+      const [title, next, pillClass] = row;
+      const status = mapServiceClassToStatus(pillClass);
+      return {
+        title,
+        sub: customerType === 'lettings' ? 'Lettings portfolio' : 'Block portfolio',
+        next,
+        key: status.key,
+        label: status.label
+      };
+    }
+
+    function getRiskRateClass(rateText = '') {
+      const value = Number(String(rateText).replace('%', '').trim());
+      if (!Number.isFinite(value)) return 'medium';
+      if (value <= 35) return 'low';
+      if (value >= 60) return 'high';
+      return 'medium';
+    }
+
+    const riskIssueCatalog = {
+      '11 Loddenspark Lane MCL': {
+        critical: ['FRA expired', 'Gas Safety certificate expired'],
+        overdue: ['EICR inspection overdue', 'Emergency lighting test missed', 'Asbestos reassessment overdue', 'Fire alarm service overdue', 'LOLER inspection overdue', 'Water hygiene check overdue']
+      },
+      '15 Bankside Close': {
+        critical: ['Gas Safety certificate expired'],
+        overdue: ['FRA review overdue', 'Emergency light remedial overdue']
+      },
+      '39 Heritage House': {
+        critical: ['FRA expired', 'Fire door assessment failed', 'Fire alarm annual service expired', 'Asbestos survey expired', 'Gas Safety certificate expired'],
+        overdue: ['EICR overdue', 'LOLER inspection overdue', 'Legionella assessment overdue']
+      },
+      '74 Maple Gardens': {
+        critical: ['Fire alarm certificate expired'],
+        overdue: ['EPC renewal overdue', 'Emergency lighting overdue', 'FRA action overdue', 'Lift service overdue']
+      },
+      '19 Daylesford Grove': {
+        critical: [],
+        overdue: ['EICR overdue', 'Gas Safety follow-up overdue', 'Asbestos action overdue']
+      }
+    };
+
+    const genericRiskIssues = {
+      critical: ['FRA expired', 'Gas certificate expired', 'Fire alarm certificate expired', 'EICR expired'],
+      overdue: ['EICR inspection overdue', 'Emergency lighting overdue', 'Asbestos reassessment overdue', 'LOLER inspection overdue', 'Water hygiene action overdue']
+    };
+
+    function getIssueTooltip(site, type, countRaw) {
+      const count = Number(countRaw) || 0;
+      const label = type === 'critical' ? 'Critical issues' : 'Overdue issues';
+      if (count <= 0) return `${label}: none`;
+      const siteCatalog = riskIssueCatalog[site] || {};
+      const source = (siteCatalog[type] && siteCatalog[type].length ? siteCatalog[type] : genericRiskIssues[type]) || [];
+      const shown = source.slice(0, Math.min(count, 3));
+      const remaining = Math.max(0, count - shown.length);
+      const suffix = remaining > 0 ? ` and ${remaining} more` : '';
+      return `${label} (${count}): ${shown.join('; ')}${suffix}.`;
+    }
+
+    function getCustomerDefaultPersona() {
+      const map = customerType === 'lettings' ? defaultPersonaByUserLettings : defaultPersonaByUser;
+      return map[selectedUser] || 'property_manager';
+    }
+
+    function localizeTextForCustomer(value) {
+      if (customerType !== 'lettings' || typeof value !== 'string') return value;
+      return value
+        .replace(/\bBlock director\b/gi, 'Portfolio lead')
+        .replace(/\bDirector\b/gi, 'Portfolio lead')
+        .replace(/\bLeaseholder\b/gi, 'Tenant')
+        .replace(/\bblocks\b/gi, 'properties')
+        .replace(/\bBlock\b/g, 'Property');
+    }
+
+    function localizeScenarioForCustomer(sourceScenario) {
+      if (customerType !== 'lettings') return sourceScenario;
+      const scenario = JSON.parse(JSON.stringify(sourceScenario));
+      scenario.label = localizeTextForCustomer(scenario.label);
+      scenario.eventTitle = localizeTextForCustomer(scenario.eventTitle);
+      scenario.eventDescription = localizeTextForCustomer(scenario.eventDescription);
+      scenario.eventAudience = localizeTextForCustomer(scenario.eventAudience);
+      scenario.eventBadge = localizeTextForCustomer(scenario.eventBadge);
+      scenario.deadlineFooter = localizeTextForCustomer(scenario.deadlineFooter);
+      scenario.riskFooter = localizeTextForCustomer(scenario.riskFooter);
+      scenario.serviceFooter = localizeTextForCustomer(scenario.serviceFooter);
+      scenario.comments.rows = (scenario.comments.rows || []).map(row => row.map(localizeTextForCustomer));
+      scenario.deadlines = (scenario.deadlines || []).map(row => row.map(localizeTextForCustomer));
+      scenario.risks = (scenario.risks || []).map(row => row.map(localizeTextForCustomer));
+      scenario.services = (scenario.services || []).map(row => row.map(localizeTextForCustomer));
+      return scenario;
+    }
+
+    function applyScenarioVisuals(rawScenario) {
+      const scenario = localizeScenarioForCustomer(rawScenario);
+      document.getElementById('eventTitle').textContent = scenario.eventTitle;
+      document.getElementById('eventDescription').textContent = scenario.eventDescription;
+      document.getElementById('eventBadge').textContent = scenario.eventBadge;
+      document.getElementById('eventAudience').textContent = scenario.eventAudience;
+
+      document.getElementById('commentUnread').textContent = scenario.comments.unread;
+      document.getElementById('commentRead').textContent = scenario.comments.read;
+
+      renderRows('commentsBody', scenario.comments.rows, ([item, actor, badge, location]) => `
+        <div class="comment-row">
+          <div><div class="comment-title">${item}</div><div class="comment-sub">${location || (customerType === 'lettings' ? 'Lettings portfolio' : 'Block portfolio')}</div></div>
+          <div class="comment-actor">${actor}</div>
+          <div>${badge ? `<span class="pill p-blue">${String(badge).toLowerCase() === 'new' ? 'New' : badge}</span>` : ''}</div>
+        </div>
+      `);
+      renderRows('issuesBody', scenario.issues, ([status, count]) => `
+        <div class="issue-row">
+          <div class="issue-status">${status}</div>
+          <div class="issue-count">${count}</div>
+        </div>
+      `);
+      const isLettingsCompliance =
+        customerType === 'lettings' &&
+        activePersona === 'compliance_manager';
+      const deadlineRows = isLettingsCompliance ? lettingsComplianceDeadlines : (scenario.deadlines || []);
+      const normalizedDeadlines = deadlineRows.map(normalizeDeadlineRow);
+      renderRows('deadlinesBody', normalizedDeadlines, (row) => `
+        <div class="deadline-row">
+          <div><div class="deadline-title">${row.title}</div><div class="deadline-sub">${row.sub}</div></div>
+          <div class="deadline-due">Due: ${row.due}</div>
+          <div><span class="deadline-badge ${row.key}">${row.label}</span></div>
+        </div>
+      `);
+      const summary = isLettingsCompliance
+        ? lettingsComplianceDeadlineSummary
+        : (scenario.deadlineSummary || deriveDeadlineSummary(scenario.deadlines || []));
+      document.getElementById('deadlineUpcoming').textContent = summary.upcoming;
+      document.getElementById('deadlineApproaching').textContent = summary.approaching;
+      document.getElementById('deadlinePast').textContent = summary.past;
+      document.getElementById('deadlinesFooter').textContent = isLettingsCompliance
+        ? 'View all properties (260)'
+        : (scenario.deadlineFooter || 'View all sites (313)');
+      const riskRows = isLettingsCompliance ? lettingsComplianceRisks : scenario.risks;
+      renderRows('riskBody', riskRows, ([site, critical, overdue, total, _riskClass, risk]) => `
+        <tr>
+          <td>${site}</td>
+          <td><span class="risk-dot critical" data-bs-toggle="tooltip" data-bs-title="${getIssueTooltip(site, 'critical', critical)}">${critical}</span></td>
+          <td><span class="risk-dot overdue" data-bs-toggle="tooltip" data-bs-title="${getIssueTooltip(site, 'overdue', overdue)}">${overdue}</span></td>
+          <td><span class="risk-total" data-bs-toggle="tooltip" data-bs-title="Total flagged compliance actions: ${total} (${critical} critical, ${overdue} overdue).">${total}</span></td>
+          <td><span class="risk-rate ${getRiskRateClass(risk)}" data-bs-toggle="tooltip" data-bs-title="Risk rate for this property: ${risk}.">${risk}</span></td>
+        </tr>
+      `);
+      document.getElementById('riskFooter').textContent = scenario.riskFooter || 'View all properties (158)';
+      const riskTitleEl = document.querySelector('#widget-risk .widget-title');
+      const riskHeaderEl = document.querySelector('#widget-risk thead th:first-child');
+      if (riskTitleEl) riskTitleEl.textContent = isLettingsCompliance ? 'HMO properties' : 'Higher risk buildings';
+      if (riskHeaderEl) riskHeaderEl.textContent = 'Property';
+      const normalizedServices = (scenario.services || []).map(normalizeServiceRow);
+      renderRows('serviceBody', normalizedServices, (row) => `
+        <div class="service-row">
+          <div><div class="service-title">${row.title}</div><div class="service-sub">${row.sub}</div></div>
+          <div class="service-next">Next: ${row.next}</div>
+          <div><span class="service-status ${row.key}">${row.label}</span></div>
+        </div>
+      `);
+      document.getElementById('serviceFooter').textContent = scenario.serviceFooter || 'View all events (587)';
+
+      const totalProperties = portfolioSizeByProperty[property] || portfolioSizeByProperty.all;
+      const sourceCompliance = isLettingsCompliance ? lettingsComplianceCategories : baseComplianceCategories;
+      categories = sourceCompliance.map((item, idx) => {
+        const scaled = Math.round(item.nonCompliant * (scenario.weights.kpi * (0.9 + idx * 0.03)));
+        const nonCompliant = Math.max(0, Math.min(totalProperties, scaled));
+        return {
+          name: item.name,
+          total: totalProperties,
+          nonCompliant,
+          compliant: Math.max(0, totalProperties - nonCompliant)
+        };
+      });
+      budgets = baseBudgets.map(([name, value], idx) => [name, Math.min(99, Math.round(value * (scenario.weights.contracts * (0.9 + idx * 0.02))))]);
+      inspections = baseInspections.map(([a, b, c]) => [Math.round(a * scenario.weights.service), Math.round(b * scenario.weights.service), Math.round(c * scenario.weights.kpi)]);
+      inspectionPms = [...baseInspectionPms];
+      renderCategoryChart();
+      renderInspectionChart();
+      renderTrendChart();
+      renderBudgetChart();
+      initUiTooltips();
+    }
+
+    function detectScenario(prompt, persona = activePersona) {
+      const q = prompt.toLowerCase();
+      if (q.includes('budget') || q.includes('overspend') || q.includes('cost') || q.includes('service charge') || q.includes('quote')) return aiScenarios.budget;
+      if (q.includes('compliance') || q.includes('statutory') || q.includes('certificate') || q.includes('audit')) return aiScenarios.compliance;
+      if (q.includes('overdue') || q.includes('escalation') || q.includes('urgent') || q.includes('issue')) return aiScenarios.overdue;
+      if (persona === 'tenant' || persona === 'leaseholder') return aiScenarios.readiness;
+      if (persona === 'compliance_manager') return aiScenarios.compliance;
+      if (customerType === 'block' && (persona === 'director' || persona === 'block_director' || persona === 'landlord')) return aiScenarios.budget;
+      return aiScenarios.readiness;
+    }
+
+    function detectPersona(prompt) {
+      const q = prompt.toLowerCase().trim();
+
+      if (/\b(senior property manager|head of property|regional property manager)\b/.test(q)) return 'senior_property_manager';
+      if (/\b(compliance manager|compliance lead|compliance team)\b/.test(q)) return 'compliance_manager';
+      if (customerType === 'block' && /\b(block director)\b/.test(q)) return 'block_director';
+      if (customerType === 'block' && /\b(director|portfolio head)\b/.test(q)) return 'director';
+      if (/\b(landlord)\b/.test(q)) return 'landlord';
+      if (/\b(leaseholder|lease holder)\b/.test(q)) return customerType === 'lettings' ? 'tenant' : 'leaseholder';
+
+      const hasPm = /\b(property manager|facilities manager|estate manager|building manager)\b/.test(q) ||
+        /\bpm\b/.test(q) ||
+        /\b(work orders?|site inspections?|contractor|maintenance schedule)\b/.test(q);
+      if (hasPm) return 'property_manager';
+
+      const hasTenant = /\b(tenant|tenent|tenet|occupier)\b/.test(q) ||
+        /\b(my requests?|ongoing requests?|create request|new request|report issue|book repair|track my repair|my flat|my apartment)\b/.test(q) ||
+        /\b(as a resident|i am a resident|resident portal)\b/.test(q);
+      if (hasTenant) return customerType === 'block' ? 'leaseholder' : 'tenant';
+
+      return getCustomerDefaultPersona();
+    }
+
+    function getResolvedProfile(persona = activePersona) {
+      const base = personaProfiles[persona] || personaProfiles.property_manager;
+      if (customerType === 'block' && persona === 'compliance_manager') {
+        return {
+          ...base,
+          baseWidgets: [...blockComplianceWidgetSet],
+          dynamicWidgets: []
+        };
+      }
+      return base;
+    }
+
+    function applyPersonaChrome() {
+      const label = getResolvedProfile(activePersona).label;
+      const badge = document.getElementById('activePersonaBadge');
+      if (badge) badge.textContent = `Customer: ${customerType === 'block' ? 'Block' : 'Lettings'} | Persona: ${label}`;
+    }
+
+    function applyPromptChipsForCustomer() {
+      const set = promptChipSets[customerType] || promptChipSets.block;
+      set.forEach((cfg, idx) => {
+        const chip = document.getElementById(`chip${idx + 1}`);
+        if (!chip) return;
+        chip.textContent = cfg.label;
+        chip.dataset.prompt = cfg.prompt;
+      });
+      if (activeChipPrompt) {
+        const stillExists = set.some(cfg => cfg.prompt === activeChipPrompt);
+        if (!stillExists) {
+          document.querySelectorAll('.prompt-chip').forEach(el => el.classList.remove('active'));
+          activeChipPrompt = '';
+        }
+      }
+    }
+
+    function getSelectionDrivenWidgets() {
+      const profile = getResolvedProfile(activePersona);
+      const isBlockComplianceRiskView =
+        customerType === 'block' &&
+        activePersona === 'compliance_manager' &&
+        activeScenario &&
+        activeScenario.id === 'compliance';
+      const isLettingsComplianceRiskView =
+        customerType === 'lettings' &&
+        activePersona === 'compliance_manager' &&
+        activeScenario &&
+        activeScenario.id === 'compliance';
+      if (isBlockComplianceRiskView) {
+        return new Set(blockComplianceWidgetSet);
+      }
+      if (isLettingsComplianceRiskView) {
+        return new Set(lettingsComplianceWidgetSet);
+      }
+      if (customerType === 'lettings') {
+        const allowed = new Set([
+          'widget-comments', 'widget-issues', 'widget-compliance', 'widget-deadlines',
+          'widget-risk', 'widget-service', 'widget-inspection', 'widget-trend'
+        ]);
+        const ids = new Set();
+        profile.baseWidgets.forEach(id => {
+          if (allowed.has(id)) ids.add(id);
+        });
+        (activeScenario.focusWidgets || []).forEach(id => {
+          if (allowed.has(id)) ids.add(id);
+        });
+        ids.add('widget-comments');
+        ids.add('widget-deadlines');
+        return ids;
+      }
+      const ids = new Set(profile.baseWidgets);
+      (activeScenario.focusWidgets || []).forEach(id => {
+        if (profile.baseWidgets.includes(id) || id === 'widget-deadlines' || id === 'widget-comments') ids.add(id);
+      });
+      if (property === 'ecb' && activePersona !== 'tenant') {
+        ids.add('widget-service');
+        ids.add('widget-deadlines');
+      }
+      if (property === 'city' && activePersona !== 'tenant') {
+        ids.add('widget-risk');
+        ids.add('widget-comments');
+      }
+      if (selectedUser === 'alex' && activePersona !== 'tenant') {
+        ids.add('widget-trend');
+      }
+      if (selectedUser === 'sam' && activePersona !== 'tenant') {
+        ids.add('widget-issues');
+        ids.add('widget-inspection');
+      }
+      if ((month === 'custom' || month === 'next6') && activePersona !== 'tenant') {
+        ids.add('widget-deadlines');
+        if (activePersona !== 'leaseholder') ids.add('widget-contracts');
+      }
+      return ids;
+    }
+
+    function getPromptWidgetBoosts(prompt) {
+      const q = prompt.toLowerCase();
+      const boosts = [];
+      if (q.includes('team') && (q.includes('performance') || q.includes('kpi'))) boosts.push('team-performance');
+      if (q.includes('team') && (q.includes('allocation') || q.includes('capacity') || q.includes('workload'))) boosts.push('team-allocation');
+      if (activePersona === 'senior_property_manager') boosts.push('team-performance', 'team-allocation');
+      return [...new Set(boosts)];
+    }
+
+    function shouldDisableDynamicWidgets() {
+      return (
+        activePersona === 'compliance_manager' &&
+        activeScenario &&
+        activeScenario.id === 'compliance' &&
+        (customerType === 'block' || customerType === 'lettings')
+      );
+    }
+
+    function resolveDynamicWidgetIds(promptText = '') {
+      if (customerType === 'lettings') return [];
+      if (shouldDisableDynamicWidgets()) return [];
+      const baseDynamic = getResolvedProfile(activePersona).dynamicWidgets;
+      const boosted = [...getPromptWidgetBoosts(promptText), ...baseDynamic];
+      return [...new Set(boosted)].slice(0, 4);
+    }
+
+    function applyWidgetFiltering() {
+      const visible = getSelectionDrivenWidgets();
+      allWidgetIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.classList.toggle('hidden', !visible.has(id));
+      });
+      compactWidgetRows();
+    }
+
+    function compactWidgetRows() {
+      document.querySelectorAll('.row-grid').forEach(row => {
+        const widgets = [...row.children].filter(el => el.classList && el.classList.contains('widget') && !el.classList.contains('hidden'));
+        row.classList.toggle('hidden-row', widgets.length === 0);
+        row.classList.toggle('single-col', widgets.length <= 1);
+      });
+    }
+
+    function initializeWidgetLayout() {
+      const allRows = [...document.querySelectorAll('.row-grid')];
+      const dynamicRow = document.getElementById('dynamicWidgetsRow');
+      const staticRows = allRows.filter(row => row !== dynamicRow);
+      if (!staticRows.length) return;
+
+      const firstRow = staticRows[0];
+      const parent = firstRow.parentElement;
+      const unified = document.createElement('section');
+      unified.id = 'widgetsGrid';
+      unified.className = 'row-grid';
+
+      staticRows.forEach(row => {
+        [...row.querySelectorAll('.widget')].forEach(widget => unified.appendChild(widget));
+        row.remove();
+      });
+      if (dynamicRow) dynamicRow.remove();
+
+      parent.appendChild(unified);
+    }
+
+    function resizeAllCharts() {
+      categoryChart.resize();
+      inspectionChart.resize();
+      trendChart.resize();
+      budgetChart.resize();
+      dynamicCharts.forEach(chart => chart.resize());
+    }
+
+    function resizeAllChartsDeferred() {
+      requestAnimationFrame(() => {
+        resizeAllCharts();
+        requestAnimationFrame(() => resizeAllCharts());
+      });
+    }
+
+    function disposeDynamicCharts() {
+      dynamicCharts.forEach(chart => chart.dispose());
+      dynamicCharts = [];
+    }
+
+    function createDynamicChartOption(chart) {
+      const base = {
+        animationDuration: 300,
+        tooltip: { trigger: 'axis' },
+        grid: { left: 30, right: 12, top: 12, bottom: 20 },
+        xAxis: { type: 'category', data: chart.labels, axisLabel: { fontSize: 10, color: '#6f6f6f' }, axisLine: { lineStyle: { color: '#d9d9d9' } } },
+        yAxis: { type: 'value', axisLabel: { fontSize: 10, color: '#6f6f6f' }, splitLine: { lineStyle: { color: '#eceff1' } } }
+      };
+      if (chart.type === 'bar') {
+        return {
+          ...base,
+          series: [{ type: 'bar', barWidth: 16, itemStyle: { color: chart.color, borderRadius: [6, 6, 0, 0] }, data: chart.values }]
+        };
+      }
+      return {
+        ...base,
+        series: [{ type: 'line', smooth: true, symbolSize: 6, lineStyle: { width: 2, color: chart.color }, itemStyle: { color: chart.color }, data: chart.values }]
+      };
+    }
+
+    function normalizeDynamicRow(row) {
+      if (!row) return { title: '', sub: '', middle: '', statusClass: 'new', statusLabel: '' };
+      if (typeof row === 'object' && !Array.isArray(row)) {
+        return {
+          title: row.title || '',
+          sub: row.sub || '',
+          middle: row.middle || '',
+          statusClass: row.statusClass || 'new',
+          statusLabel: row.statusLabel || ''
+        };
+      }
+      const left = String(row[0] || '');
+      const parts = left.split('<div');
+      const title = parts[0].trim();
+      const middle = row[1] || '';
+      const labelRaw = String(row[2] || '').replace(/<[^>]*>/g, '').trim();
+      const statusLabel = labelRaw || '';
+      const statusClass = statusLabel.toLowerCase().replace(/\s+/g, '-') || 'new';
+      return {
+        title,
+        sub: customerType === 'lettings' ? 'Lettings portfolio' : 'Block portfolio',
+        middle,
+        statusClass,
+        statusLabel
+      };
+    }
+
+    function buildDynamicWidgetMarkup(def, idx) {
+      const chartId = `dynamicChart${idx}`;
+      const kpiHtml = (def.kpis || []).map(item => `<div><strong style="color:${item.color};">${item.value}</strong><span>${item.label}</span></div>`).join('');
+      const normalizedRows = (def.rows || []).map(normalizeDynamicRow);
+      const listHtml = `
+        <div class="dynamic-list">
+          ${normalizedRows.map(row => `
+            <div class="dynamic-row">
+              <div><div class="dynamic-title">${row.title}</div><div class="dynamic-sub">${row.sub}</div></div>
+              <div class="dynamic-middle">${row.middle}</div>
+              <div>${row.statusLabel ? `<span class="dynamic-status ${row.statusClass}">${row.statusLabel}</span>` : ''}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      return `
+        <article class="widget h-320 dynamic-ai-widget">
+          <div class="widget-title">${def.title}</div>
+          <div class="widget-body">
+            ${def.kpis ? `<div class="dynamic-summary">${kpiHtml}</div>` : ''}
+            ${def.style === 'reference' ? listHtml : `${def.chart ? `<div class="chart-box chart-mini"><div id="${chartId}" class="echart echart-sm"></div></div>` : ''}${listHtml}`}
+          </div>
+          <div class="widget-footer"><a href="#" class="foot-link">${def.cta}</a></div>
+        </article>
+      `;
+    }
+
+    function renderDynamicWidgets() {
+      const row = document.getElementById('widgetsGrid') || document.getElementById('dynamicWidgetsRow');
+      if (!row) return;
+      disposeDynamicCharts();
+      row.querySelectorAll('.dynamic-ai-widget').forEach(el => el.remove());
+      const defs = activeDynamicWidgetIds.map(id => dynamicWidgetCatalog[id]).filter(Boolean);
+      if (!defs.length) {
+        compactWidgetRows();
+        return;
+      }
+      row.insertAdjacentHTML('beforeend', defs.map((def, idx) => buildDynamicWidgetMarkup(def, idx)).join(''));
+      compactWidgetRows();
+
+      defs.forEach((def, idx) => {
+        if (def.style === 'reference') return;
+        if (!def.chart) return;
+        const host = document.getElementById(`dynamicChart${idx}`);
+        if (!host) return;
+        const chart = echarts.init(host);
+        chart.setOption(createDynamicChartOption(def.chart));
+        dynamicCharts.push(chart);
+      });
+    }
+
+    function renderCategoryChart() {
+      const rows = categories.map(item => {
+        const total = Math.max(1, item.total || 1);
+        const nonCompliant = Math.max(0, Math.min(total, item.nonCompliant || 0));
+        const compliant = Math.max(0, total - nonCompliant);
+        const compliantRate = Math.round((compliant / total) * 100);
+        const nonCompliantRate = Math.round((nonCompliant / total) * 100);
+        return { ...item, total, nonCompliant, compliant, compliantRate, nonCompliantRate };
+      });
+      categoryChart.setOption({
+        animationDuration: 350,
+        grid: { left: 8, right: 12, top: 8, bottom: 24, containLabel: true },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: { type: 'shadow' },
+          formatter: params => {
+            const p = params && params[0];
+            if (!p || !p.data) return '';
+            const r = p.data.meta;
+            return [
+              `<strong>${r.name}</strong>`,
+              `Non-compliant: ${r.nonCompliant} (${r.nonCompliantRate}%)`,
+              `Compliant: ${r.compliant} (${r.compliantRate}%)`,
+              `Portfolio total: ${r.total}`
+            ].join('<br/>');
+          }
+        },
+        xAxis: {
+          type: 'value',
+          min: 0,
+          max: rows.length ? rows[0].total : 1000,
+          axisLabel: { color: '#6f6f6f', fontSize: 11, formatter: v => `${Math.round((v / (rows[0]?.total || 1000)) * 100)}%` },
+          splitLine: { lineStyle: { color: '#eceff1' } }
+        },
+        yAxis: {
+          type: 'category',
+          inverse: true,
+          axisLabel: { color: '#646464', fontSize: 11 },
+          axisLine: { show: false },
+          axisTick: { show: false },
+          data: rows.map(item => item.name)
+        },
+        series: [
+          {
+            name: 'Non-compliant',
+            type: 'bar',
+            stack: 'compliance',
+            barWidth: 11,
+            barCategoryGap: '45%',
+            data: rows.map(item => ({
+              value: item.nonCompliant,
+              meta: item,
+              itemStyle: { color: '#d94c61', borderRadius: item.compliant === 0 ? [8, 8, 8, 8] : [8, 0, 0, 8] }
+            })),
+            label: {
+              show: true,
+              position: 'insideLeft',
+              color: '#ffffff',
+              fontSize: 10,
+              formatter: p => (p.value > 0 ? `${p.value}` : '')
+            }
+          },
+          {
+            name: 'Compliant',
+            type: 'bar',
+            stack: 'compliance',
+            barWidth: 11,
+            data: rows.map(item => ({
+              value: item.compliant,
+              meta: item,
+              itemStyle: { color: '#2f9c5d', borderRadius: item.nonCompliant === 0 ? [8, 8, 8, 8] : [0, 8, 8, 0] }
+            })),
+            label: {
+              show: true,
+              position: 'right',
+              color: '#666',
+              fontSize: 10,
+              formatter: p => `${p.data.meta.compliantRate}%`
+            }
+          }
+        ]
+      });
+    }
+
+    function renderInspectionChart() {
+      const labels = inspections.map((_, idx) => `W${idx + 1}`);
+      inspectionChart.setOption({
+        animationDuration: 350,
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: { type: 'shadow' },
+          backgroundColor: '#f7f8fa',
+          borderColor: '#dfe3e8',
+          borderWidth: 1,
+          textStyle: { color: '#646d77', fontSize: 12 },
+          extraCssText: 'border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.12);padding:6px 8px;',
+          formatter: params => {
+            const sorted = [...params].sort((a, b) => a.seriesIndex - b.seriesIndex);
+            const rows = sorted.map((p, i) => {
+              const pmText = p.data.pm || 'PM 1';
+              const border = i < sorted.length - 1 ? 'border-bottom:1px solid #c8ced6;' : '';
+              return `<div style="display:grid;grid-template-columns:14px 22px 1fr;gap:6px;align-items:center;padding:5px 2px;${border}">
+                <span style="width:12px;height:12px;border-radius:50%;background:${p.color};display:inline-block"></span>
+                <span style="font-size:13px;line-height:1;color:#5f6873;font-weight:700">${p.value}</span>
+                <span style="font-size:13px;line-height:1.25;color:#5f6873">${pmText}</span>
+              </div>`;
+            }).join('');
+            return `<div style="min-width:220px;max-width:320px">${rows}</div>`;
+          }
+        },
+        grid: { left: 42, right: 14, top: 14, bottom: 22 },
+        xAxis: {
+          type: 'category',
+          data: labels,
+          axisLabel: { color: '#6f6f6f', fontSize: 10 },
+          axisLine: { lineStyle: { color: '#d9d9d9' } }
+        },
+        yAxis: {
+          type: 'value',
+          axisLabel: { color: '#6f6f6f', fontSize: 10 },
+          splitLine: { lineStyle: { color: '#eceff1' } }
+        },
+        series: [
+          { name: 'Completed', type: 'bar', stack: 'total', barMaxWidth: 14, itemStyle: { color: '#2f9c5d' }, data: inspections.map((v, idx) => ({ value: v[0], pm: inspectionPms[idx][0] })) },
+          { name: 'Scheduled', type: 'bar', stack: 'total', barMaxWidth: 14, itemStyle: { color: '#1f9dd6' }, data: inspections.map((v, idx) => ({ value: v[1], pm: inspectionPms[idx][1] })) },
+          { name: 'Overdue', type: 'bar', stack: 'total', barMaxWidth: 14, itemStyle: { color: '#d94c61' }, data: inspections.map((v, idx) => ({ value: v[2], pm: inspectionPms[idx][2] })) }
+        ]
+      });
+    }
+
+    function buildTrendForecastData() {
+      const total = portfolioSizeByProperty[property] || portfolioSizeByProperty.all;
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'];
+      const histNonCompliant = [62, 58, 55, 51, 46, 42];
+      const forecastNonCompliant = [39, 37, 35, 33];
+      const uncertainty = [7, 8, 9, 10];
+      const weight = activeScenario.weights?.kpi || 1;
+      const scaledHist = histNonCompliant.map(v => Math.max(0, Math.round(v * (0.9 + (weight - 1) * 0.35))));
+      const future = forecastNonCompliant.map(v => Math.max(0, Math.round(v * (0.92 + (weight - 1) * 0.3))));
+      const spread = uncertainty;
+      const nonCompliant = [...scaledHist, ...future];
+
+      const complianceRate = nonCompliant.map(v => Number((((total - v) / total) * 100).toFixed(1)));
+      const actual = [...complianceRate.slice(0, 6), null, null, null, null];
+      const forecast = [null, null, null, null, null, complianceRate[5], ...complianceRate.slice(6)];
+      const forecastLower = [null, null, null, null, null, complianceRate[5], ...complianceRate.slice(6).map((r, i) => Number(Math.max(0, r - spread[i] * 0.2).toFixed(1)))];
+      const forecastUpper = [null, null, null, null, null, complianceRate[5], ...complianceRate.slice(6).map((r, i) => Number(Math.min(100, r + spread[i] * 0.25).toFixed(1)))];
+      const forecastBand = forecastUpper.map((u, i) => {
+        const l = forecastLower[i];
+        if (u === null || l === null) return null;
+        return Number((u - l).toFixed(1));
+      });
+
+      return {
+        months,
+        total,
+        nonCompliant,
+        actual,
+        forecast,
+        forecastLower,
+        forecastUpper,
+        forecastBand,
+        target: 98
+      };
+    }
+
+    function renderTrendChart() {
+      const trend = buildTrendForecastData();
+      trendChart.setOption({
+        animationDuration: 350,
+        tooltip: {
+          trigger: 'axis',
+          backgroundColor: '#f7f8fa',
+          borderColor: '#dfe3e8',
+          borderWidth: 1,
+          textStyle: { color: '#4f5963', fontSize: 12 },
+          formatter: params => {
+            const idx = params[0]?.dataIndex ?? 0;
+            const actualVal = trend.actual[idx];
+            const forecastVal = trend.forecast[idx];
+            const lowVal = trend.forecastLower[idx];
+            const highVal = trend.forecastUpper[idx];
+            const nonComp = trend.nonCompliant[idx];
+            const lines = [`<strong>${trend.months[idx]}</strong>`];
+            if (actualVal !== null && actualVal !== undefined) lines.push(`Actual compliance: ${actualVal}%`);
+            if (forecastVal !== null && forecastVal !== undefined) {
+              lines.push(`Forecast compliance: ${forecastVal}%`);
+              if (lowVal !== null && highVal !== null) lines.push(`Forecast range: ${lowVal}% to ${highVal}%`);
+            }
+            lines.push(`Estimated non-compliant properties: ${nonComp} of ${trend.total}`);
+            return lines.join('<br/>');
+          }
+        },
+        grid: { left: 42, right: 18, top: 14, bottom: 22 },
+        xAxis: {
+          type: 'category',
+          data: trend.months,
+          axisLabel: { color: '#6f6f6f', fontSize: 10 },
+          axisLine: { lineStyle: { color: '#d9d9d9' } }
+        },
+        yAxis: {
+          type: 'value',
+          min: 70,
+          max: 100,
+          axisLabel: { color: '#6f6f6f', fontSize: 10, formatter: '{value}%' },
+          splitLine: { lineStyle: { color: '#eceff1' } }
+        },
+        series: [
+          {
+            name: 'Actual',
+            type: 'line',
+            smooth: true,
+            symbolSize: 6,
+            lineStyle: { width: 2, color: '#2f9c5d' },
+            itemStyle: { color: '#2f9c5d' },
+            data: trend.actual
+          },
+          {
+            name: 'Forecast lower',
+            type: 'line',
+            smooth: true,
+            symbol: 'none',
+            lineStyle: { opacity: 0 },
+            data: trend.forecastLower,
+            stack: 'forecast-band',
+            z: 1
+          },
+          {
+            name: 'Forecast range',
+            type: 'line',
+            smooth: true,
+            symbol: 'none',
+            lineStyle: { opacity: 0 },
+            areaStyle: { color: 'rgba(30, 157, 214, 0.22)' },
+            data: trend.forecastBand,
+            stack: 'forecast-band',
+            z: 1
+          },
+          {
+            name: 'Forecast',
+            type: 'line',
+            smooth: true,
+            symbolSize: 6,
+            lineStyle: { width: 2, color: '#1f9dd6', type: 'dashed' },
+            itemStyle: { color: '#1f9dd6' },
+            data: trend.forecast,
+            markLine: {
+              symbol: 'none',
+              label: { formatter: 'Target 98%', color: '#a86c0f', fontSize: 10 },
+              lineStyle: { color: '#ff9f1c', width: 1.5, type: 'dashed' },
+              data: [{ yAxis: trend.target }]
+            }
+          }
+        ]
+      });
+    }
+
+    function renderBudgetChart() {
+      const buildingRows = ['Building 1', 'Building 2', 'Building 3', 'Building 4', 'Building 5', 'Building 6', 'Building 7'];
+      const monthTicks = ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'];
+      const budgetValues = [6.0, 2.9, 0.15, 3.6, 4.8, 6.0, 4.3];
+      const budgetColors = ['#1f9dd6', '#ff9f1c', '#d94c61', '#ff9f1c', '#ff9f1c', '#1f9dd6', '#ff9f1c'];
+      budgetChart.setOption({
+        animationDuration: 350,
+        tooltip: { trigger: 'item' },
+        grid: { left: 98, right: 18, top: 8, bottom: 34 },
+        xAxis: {
+          type: 'value',
+          min: 0,
+          max: 6,
+          interval: 1,
+          axisLabel: {
+            color: '#5f5f8a',
+            fontSize: 10,
+            formatter: value => monthTicks[value] || ''
+          },
+          axisLine: { lineStyle: { color: '#d9dce6' } },
+          axisTick: { show: false },
+          splitLine: { lineStyle: { color: '#dfe3ee', type: 'dashed' } }
+        },
+        yAxis: {
+          type: 'category',
+          inverse: true,
+          axisLabel: { color: '#5f5f8a', fontSize: 10 },
+          axisLine: { show: false },
+          axisTick: { show: false },
+          data: buildingRows
+        },
+        series: [{
+          type: 'bar',
+          barWidth: 8,
+          data: budgetValues.map((v, idx) => ({ value: v, itemStyle: { color: budgetColors[idx], borderRadius: [8, 8, 8, 8] } })),
+          label: { show: false }
+        }]
+      });
+    }
+
+    function scaleValues(values, factor) {
+      return values.map(v => Math.max(0, Math.round(v * factor)));
+    }
+
+    function getCustomMonthSpan() {
+      if (!customRange.from || !customRange.to) return 1;
+      const from = new Date(customRange.from);
+      const to = new Date(customRange.to);
+      if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime()) || to < from) return 1;
+      const diffDays = Math.floor((to - from) / 86400000) + 1;
+      const span = diffDays / 30;
+      return Math.max(1, Math.min(12, Number(span.toFixed(2))));
+    }
+
+    function getDataForPeriod() {
+      const weights = activeScenario.weights;
+      const weighted = source => ({
+        kpi: scaleValues(source.kpi, weights.kpi),
+        service: scaleValues(source.service, weights.service),
+        contracts: scaleValues(source.contracts, weights.contracts),
+        assets: [source.assets[0], ...scaleValues(source.assets.slice(1), weights.assetsRisk)]
+      });
+      if (month !== 'custom') return weighted(models[property][month]);
+      const base = models[property].current;
+      const span = getCustomMonthSpan();
+      return {
+        kpi: scaleValues(base.kpi, span * weights.kpi),
+        service: scaleValues(base.service, Math.max(1, span * 0.9) * weights.service),
+        contracts: scaleValues(base.contracts, Math.max(1, span * 0.65) * weights.contracts),
+        assets: [base.assets[0], ...scaleValues(base.assets.slice(1), Math.max(1, span * 0.5) * weights.assetsRisk)]
+      };
+    }
+
+    function getPersonaKpiValues(data, factor) {
+      if (activePersona === 'tenant') {
+        const open = Math.max(1, Math.round((activeScenario.comments.unread || 2) * factor * 0.35));
+        const awaiting = Math.max(1, Math.round((activeScenario.comments.read || 3) * factor * 0.2));
+        const impacts = Math.max(1, Math.round((data.kpi[2] || 4) * factor * 0.14));
+        return [open, awaiting, impacts];
+      }
+      if (activePersona === 'leaseholder') {
+        return [
+          Math.max(1, Math.round(data.kpi[0] * factor * 0.45)),
+          Math.max(1, Math.round(data.kpi[1] * factor * 0.28)),
+          Math.max(1, Math.round(data.kpi[2] * factor * 0.22))
+        ];
+      }
+      if (activePersona === 'director' || activePersona === 'block_director' || activePersona === 'landlord') {
+        return [
+          Math.max(1, Math.round(data.kpi[1] * factor * 0.55)),
+          Math.max(1, Math.round(data.kpi[2] * factor * 0.45)),
+          Math.max(1, Math.round(data.service[2] * factor * 1.2))
+        ];
+      }
+      return scaleValues(data.kpi, factor);
+    }
+
+    function applyPersonaKpiTitles() {
+      const profile = personaKpiProfiles[activePersona] || personaKpiProfiles.property_manager;
+      const [t1, t2, t3] = profile.titles;
+      document.getElementById('kpiTitle1').textContent = t1;
+      document.getElementById('kpiTitle2').textContent = t2;
+      document.getElementById('kpiTitle3').textContent = t3;
+    }
+
+    function updateKpis() {
+      const data = getDataForPeriod();
+      const factor = userScale[selectedUser] || 1;
+      const [u, p, a] = getPersonaKpiValues(data, factor);
+      const [svcC, svcD, svcN] = scaleValues(data.service, factor);
+      const [conA, conE, conI] = scaleValues(data.contracts, factor);
+      const [astT, astR, astN] = scaleValues(data.assets, factor);
+      const isBlockCompliance = customerType === 'block' && activePersona === 'compliance_manager';
+      const contractsActiveVal = isBlockCompliance ? 1187 : conA;
+      const contractsExpiringVal = isBlockCompliance ? 35 : conE;
+      const contractsInstructedVal = isBlockCompliance ? 13 : conI;
+
+      applyPersonaKpiTitles();
+      document.getElementById('kpiUpcoming').textContent = u;
+      document.getElementById('kpiPast').textContent = p;
+      document.getElementById('kpiApproaching').textContent = a;
+      document.getElementById('svcCompliant').textContent = svcC;
+      document.getElementById('svcDueSoon').textContent = svcD;
+      document.getElementById('svcNon').textContent = svcN;
+      document.getElementById('contractsActive').textContent = contractsActiveVal;
+      document.getElementById('contractsExpiring').textContent = contractsExpiringVal;
+      document.getElementById('contractsInactive').textContent = contractsInstructedVal;
+      document.getElementById('assetsTotal').textContent = astT;
+      document.getElementById('assetsRisk').textContent = astR;
+      document.getElementById('assetsNon').textContent = astN;
+      document.getElementById('updatedText').textContent = `Last update at ${new Date().toLocaleString()}`;
+      applyPersonaChrome();
+    }
+
+    async function runAiPrompt(prompt, fromUser = false) {
+      const trimmed = prompt.trim();
+      if (!trimmed) return;
+      if (fromUser) {
+        addUserChatMessage(trimmed);
+        updateChatEmptyState();
+      }
+      let loadingNode = null;
+      if (fromUser) {
+        loadingNode = addLoadingIndicator();
+        await new Promise(resolve => setTimeout(resolve, 1300));
+      }
+      lastAiPrompt = trimmed;
+      activePersona = detectPersona(trimmed);
+      activeScenario = detectScenario(trimmed, activePersona);
+      if (activePersona === 'compliance_manager') activeScenario = aiScenarios.compliance;
+      if (activePersona === 'tenant') activeScenario = aiScenarios.readiness;
+      activeDynamicWidgetIds = resolveDynamicWidgetIds(trimmed);
+      applyPersonaChrome();
+      applyScenarioVisuals(activeScenario);
+      applyWidgetFiltering();
+      renderDynamicWidgets();
+      updateKpis();
+      resizeAllChartsDeferred();
+      if (fromUser) {
+        if (loadingNode && loadingNode.parentNode) loadingNode.remove();
+        await addAssistantWidgetResponse(trimmed);
+      }
+    }
+
+    document.querySelectorAll('.tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        month = btn.dataset.month;
+        document.getElementById('rangeDropdownBtn').classList.remove('active');
+        applyWidgetFiltering();
+        renderDynamicWidgets();
+        updateKpis();
+        resizeAllChartsDeferred();
+      });
+    });
+
+    document.getElementById('propertyFilter').addEventListener('change', e => {
+      property = e.target.value;
+      applyWidgetFiltering();
+      renderDynamicWidgets();
+      updateKpis();
+      resizeAllChartsDeferred();
+    });
+
+    document.getElementById('userFilter').addEventListener('change', e => {
+      selectedUser = e.target.value;
+      activePersona = detectPersona(lastAiPrompt || '');
+      activeDynamicWidgetIds = resolveDynamicWidgetIds(lastAiPrompt || '');
+      applyPersonaChrome();
+      applyScenarioVisuals(activeScenario);
+      applyWidgetFiltering();
+      renderDynamicWidgets();
+      updateKpis();
+      resizeAllChartsDeferred();
+    });
+
+    document.querySelectorAll('.customer-segment .seg-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.customer-segment .seg-btn').forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        customerType = btn.dataset.customer;
+        applyPromptChipsForCustomer();
+        activePersona = detectPersona(lastAiPrompt || '');
+        activeDynamicWidgetIds = resolveDynamicWidgetIds(lastAiPrompt || '');
+        applyPersonaChrome();
+        applyScenarioVisuals(activeScenario);
+        applyWidgetFiltering();
+        renderDynamicWidgets();
+        updateKpis();
+        resizeAllChartsDeferred();
+      });
+    });
+
+    document.getElementById('dismissBanner').addEventListener('click', () => {
+      const banner = document.querySelector('.top-hero');
+      banner.style.display = 'none';
+    });
+
+    document.querySelectorAll('.prompt-chip').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.prompt-chip').forEach(el => el.classList.remove('active'));
+        btn.classList.add('active');
+        activeChipPrompt = btn.dataset.prompt;
+        document.getElementById('aiPromptInput').value = btn.dataset.prompt;
+      });
+    });
+
+    document.getElementById('runAiPrompt').addEventListener('click', () => {
+      runAiPrompt(document.getElementById('aiPromptInput').value, true);
+    });
+
+    document.getElementById('aiPromptInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') runAiPrompt(e.target.value, true);
+    });
+
+    customRange = { from: null, to: null };
+    document.getElementById('rangeDropdownBtn').textContent = 'Custom range';
+
+    const rangeInput = document.getElementById('rangePickerInput');
+    const rangeBtn = document.getElementById('rangeDropdownBtn');
+    const picker = new Litepicker({
+      element: rangeInput,
+      singleMode: false,
+      numberOfMonths: 2,
+      numberOfColumns: 2,
+      autoApply: true,
+      format: 'YYYY-MM-DD',
+      dropdowns: {
+        minYear: 2024,
+        maxYear: 2035,
+        months: true,
+        years: true
+      },
+      setup: (p) => {
+        p.on('selected', (start, end) => {
+          if (!start || !end) return;
+          customRange = { from: start.format('YYYY-MM-DD'), to: end.format('YYYY-MM-DD') };
+          month = 'custom';
+          document.querySelectorAll('.tab').forEach(t => {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
+          });
+          rangeBtn.classList.add('active');
+          rangeBtn.textContent = `Custom range: ${start.format('D MMM')} - ${end.format('D MMM')}`;
+          applyWidgetFiltering();
+          renderDynamicWidgets();
+          updateKpis();
+          resizeAllChartsDeferred();
+        });
+      }
+    });
+
+    rangeBtn.addEventListener('click', () => {
+      picker.show();
+    });
+
+    function openRaeWindow() {
+      const app = document.getElementById('chatApp');
+      const launcher = document.getElementById('openRae');
+      if (!app || !launcher) return;
+      app.classList.remove('hidden');
+      launcher.classList.add('hidden');
+      const input = document.getElementById('aiPromptInput');
+      if (input) input.focus();
+    }
+
+    function closeRaeWindow() {
+      const app = document.getElementById('chatApp');
+      const launcher = document.getElementById('openRae');
+      if (!app || !launcher) return;
+      app.classList.add('hidden');
+      launcher.classList.remove('hidden');
+    }
+
+    document.getElementById('openRae').addEventListener('click', openRaeWindow);
+    document.getElementById('closeRae').addEventListener('click', closeRaeWindow);
+
+    initEmailGate();
+    initializeWidgetLayout();
+    applyPromptChipsForCustomer();
+    runAiPrompt('As a property manager show maintenance schedule, inspections, issues and resident request workload');
+    updateChatEmptyState();
+    initUiTooltips();
+
+    window.addEventListener('resize', () => {
+      resizeAllCharts();
+    });
+  </script>
+</body>
+</html>
